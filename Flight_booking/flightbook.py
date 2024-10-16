@@ -12,29 +12,11 @@ email_list = ["aaa@gmail.com", "123@gmail.com"]
 @app.route('/')
 def index():
     # session['current_username'] = 'aaa'
+    
     current_username = session.get('current_username', "Login / Sign up")
     return render_template('homepage.html', current_username=current_username)
 
-
-@app.route('/process-booking', methods=['POST'])
-def process_booking():
-    # 获取用户提交的表单数据
-    from_city = request.form.get('from_city')
-    to_city = request.form.get('to_city')
-    travellers_class = request.form.get('travellers_class')
-    departure_date = request.form.get('departure_date')
-    return_date = request.form.get('return_date')
-
-    # 你可以在这里处理数据，例如打印到控制台或保存到数据库
-    print(f"From: {from_city}")
-    print(f"To: {to_city}")
-    print(f"Travellers and Class: {travellers_class}")
-    print(f"Departure Date: {departure_date}")
-    print(f"Return Date: {return_date}")
-
-    # 返回一个响应给用户
-    return f"Booking details: From {from_city} to {to_city} for {travellers_class}, departing on {departure_date}, returning on {return_date}"
-
+    
 
 @app.route('/flights')
 def flights():
@@ -48,8 +30,8 @@ def booking_history():
 
 @app.route('/login_page')
 def login_page():
-    return 'login.html'
-
+    error = session.pop('error', None)
+    return render_template('login.html', error=error)
 
 @app.route('/cart')
 def cart():
@@ -63,26 +45,33 @@ def logout():
 
 
 
-@app.route('/search-results')
+@app.route('/search-results', methods=['POST'])
 def search_results():
-    # 获取查询参数
-    from_city = request.args.get('from')
-    to_city = request.args.get('to')
-    travellers = request.args.get('travellers')
-    departure = request.args.get('departure')
-    return_date = request.args.get('return')
+    trip_type = request.form.get('trip')
+    from_city = request.form['from_city']
+    to_city = request.form['to_city']
+    travellers = request.form['travellers_class']
+    departure_date = request.form['departure_date']
+    return_date = request.form.get('return_date', None)
 
-    # 处理搜索逻辑并返回结果页面
-    return 'searching result'
+    print(f"Trip Type: {trip_type}")
+    print(f"From: {from_city}")
+    print(f"To: {to_city}")
+    print(f"Travellers: {travellers}")
+    print(f"Departure Date: {departure_date}")
+    print(f"Return Date: {return_date}")
 
-#
-# @app.route('/')
-# def index():
-#     error = session.pop('error', None)
-#     return render_template('login.html', error=error)
+    if trip_type == "oneway" :
+        info = f"{travellers} from {from_city} to {to_city} at {departure_date}. "
+    else:
+        info = f"{travellers} from {from_city} to {to_city} in {departure_date} and return in {return_date} "
+
+    return info
+
 
 @app.route('/login', methods=['POST'])
 def login():
+
     username = request.form['username']
     password = request.form['password']
     
@@ -92,14 +81,11 @@ def login():
 
             session['current_username'] = username
 
-            return redirect(url_for('page_a'))
+            return redirect(url_for('index'))
         
     session['error'] = "Invalid username or password"  
-    return redirect(url_for('index')) 
+    return redirect(url_for('login_page')) 
 
-@app.route('/page_a')
-def page_a():
-    return "Welcome to Page A!"
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -123,7 +109,12 @@ def register():
 
         print(username_list, password_list, email_list)
 
-        return "homepage"
+        session.pop('error', None)
+
+        current_username = username
+
+        session['current_username'] = current_username
+        return redirect(url_for('index'))
 
     return render_template('register.html')
 
