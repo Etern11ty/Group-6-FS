@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passenger Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://grinews.cn/news/wp-content/uploads/2019/11/maldives-1993704_960_720.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], input[type="email"], input[type="date"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .row .form-group {
+            width: 48%;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .save-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .details-btn {
+            background-color: #f0ad4e;
+            color: white;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        function togglePassengerInfo() {
+            var passengers = document.getElementById('passengers').value;
+            var secondPassenger = document.getElementById('secondPassenger');
+            
+            if (passengers == "2") {
+                secondPassenger.classList.remove('hidden');
+            } else {
+                secondPassenger.classList.add('hidden');
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Passenger Information</h1>
+        <form action="/passenger_info" method="POST">
+            # choose the number of passenger
+            <div class="form-group">
+                <label for="passengers">Number of Passengers</label>
+                <input type="number" id="passengers" name="passengers" value="1" min="1" max="2" onchange="togglePassengerInfo()">
+            </div>
+
+            # Second passenger's Information
+            <h2>Passenger 1</h2>
+            <div class="row">
+                <div class="form-group">
+                    <label for="first_name_1">First Name*</label>
+                    <input type="text" id="first_name_1" name="first_name_1" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name_1">Last Name*</label>
+                    <input type="text" id="last_name_1" name="last_name_1" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="dob_1">Date of Birth*</label>
+                    <input type="date" id="dob_1" name="dob_1" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_number_1">Government Issued ID*</label>
+                    <input type="text" id="id_number_1" name="id_number_1" required>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label for="email_1">Email*</label>
+                    <input type="email" id="email_1" name="email_1" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone_1">Phone Number*</label>
+                    <input type="text" id="phone_1" name="phone_1" required>
+                </div>
+            </div>
+
+            <h2>Address</h2>
+            <div class="form-group">
+                <label for="address1_1">Address Line 1*</label>
+                <input type="text" id="address1_1" name="address1_1" required>
+            </div>
+            <div class="form-group">
+                <label for="address2_1">Address Line 2</label>
+                <input type="text" id="address2_1" name="address2_1">
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="country_1">Country*</label>
+                    <input type="text" id="country_1" name="country_1" required>
+                </div>
+                <div class="form-group">
+                    <label for="city_1">City*</label>
+                    <input type="text" id="city_1" name="city_1" required>
+                </div>
+                <div class="form-group">
+                    <label for="postal_code_1">Postal Code*</label>
+                    <input type="text" id="postal_code_1" name="postal_code_1" required>
+                </div>
+            </div>
+
+            # Second passenger's Information
+            <div id="secondPassenger" class="hidden">
+                <h2>Passenger 2</h2>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="first_name_2">First Name*</label>
+                        <input type="text" id="first_name_2" name="first_name_2">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name_2">Last Name*</label>
+                        <input type="text" id="last_name_2" name="last_name_2">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="dob_2">Date of Birth*</label>
+                        <input type="date" id="dob_2" name="dob_2">
+                    </div>
+                    <div class="form-group">
+                        <label for="id_number_2">Government Issued ID*</label>
+                        <input type="text" id="id_number_2" name="id_number_2">
+                    </div>
+                </div>
+
+                <h2>Address</h2>
+                <div class="form-group">
+                    <label for="address1_2">Address Line 1</label>
+                    <input type="text" id="address1_2" name="address1_2">
+                </div>
+                <div class="form-group">
+                    <label for="address2_2">Address Line 2</label>
+                    <input type="text" id="address2_2" name="address2_2">
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="country_2">Country</label>
+                        <input type="text" id="country_2" name="country_2">
+                    </div>
+                    <div class="form-group">
+                        <label for="city_2">City</label>
+                        <input type="text" id="city_2" name="city_2">
+                    </div>
+                    <div class="form-group">
+                        <label for="postal_code_2">Postal Code</label>
+                        <input type="text" id="postal_code_2" name="postal_code_2">
+                    </div>
+                </div>
+            </div>
+
+            <h2>Emergency Contact Information</h2>
+            <div class="row">
+                <div class="form-group">
+                    <label for="em_first_name">First name*</label>
+                    <input type="text" id="em_first_name" name="em_first_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="em_last_name">Last name*</label>
+                    <input type="text" id="em_last_name" name="em_last_name" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="em_phone">Phone number*</label>
+                    <input type="text" id="em_phone" name="em_phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="em_email">Email address*</label>
+                    <input type="email" id="em_email" name="em_email" required>
+                </div>
+            </div>
+
+            <h2>Bag Information</h2>
+            <p>Each passenger is allowed one free carry-on bag and one personal item. First checked bag for each passenger is also free. Second bag check fees are waived for loyalty program members. See the full bag policy.</p>
+            <div class="form-group">
+                <label for="bags">Checked bags</label>
+                <input type="number" id="bags" name="bags" value="1" min="0">
+            </div>
+
+            <div class="buttons">
+                <button type="submit" class="save-btn">Save and submit</button>
+                <button type="button" class="details-btn">See details</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+
+
