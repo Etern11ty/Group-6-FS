@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G6 Flights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='homepage/css/styles.css') }}">
+</head>
+<body>
+
+    <!-- Top navigation bar -->
+    <div class="top-nav">
+        <a href="{{ url_for('login_page') }}">{{ current_username }}</a>
+        <a href="{{ url_for('cart') }}">Cart</a>
+    </div>
+
+    <!-- Fixed Menu with Background Image -->
+    <div id="imageMenu" class="image-menu">
+        <ul>
+            <li><a href="{{ url_for('flights') }}">Flights</a></li>
+            <li><a href="{{ url_for('booking_history') }}">Booking History</a></li>
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </div>
+
+
+    <!-- Main content with background image -->
+    <section class="welcome-section" style="background-image: url('{{ url_for('static', filename='homepage/images/Background.jpg') }}');">
+        <div class="overlay">
+            <img src="{{ url_for('static', filename='homepage/images/Welcome to G6 flights.png') }}" alt="Welcome" class="welcome-image">
+            <div class="booking-form">
+                <h2 class="form-title">Booking process</h2>
+
+                <!-- Trip Type Selection -->
+                <div class="form-row radio-row">
+                    <label>
+                        <input type="radio" name="trip" checked> Oneway
+                    </label>
+                    <label>
+                        <input type="radio" name="trip"> Round trip
+                    </label>
+                    <label>
+                        <input type="radio" name="trip"> Multi city
+                    </label>
+                </div>
+
+                <!-- Form Fields -->
+                <form method="POST" action="/process_booking">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>From:</label>
+                            <input type="text" name="from_city" placeholder="Enter departure city">
+                        </div>
+                        <div class="form-group">
+                            <label>To:</label>
+                            <input type="text" name="to_city" placeholder="Enter destination city">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Travellers and class:</label>
+                            <select name="travellers_class">
+                                <option value="1 Traveller">1 Traveller</option>
+                                <option value="2 Travellers">2 Travellers</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Departure Date:</label>
+                            <input type="date" name="departure_date" id="departureDate" min="">
+                        </div>
+                        <div class="form-group">
+                            <label>Return Date:</label>
+                            <input type="date" name="return_date" id="returnDate" min="">
+                        </div>
+                    </div>
+
+                    <<!-- Search Button -->
+                    <div class="search-group">
+                        <button type="button" class="search-button" id="searchButton">
+                            <img src="{{ url_for('static', filename='homepage/images/Search.png') }}" alt="Search">
+                        </button>
+                    </div>
+                </form>
+
+                <script>
+                    // 获取当前日期
+                    const today = new Date().toISOString().split('T')[0];
+
+                    // 设置出发日期和返回日期的最小值为今天
+                    const departureDateInput = document.getElementById("departureDate");
+                    const returnDateInput = document.getElementById("returnDate");
+
+                    departureDateInput.setAttribute("min", today);
+                    returnDateInput.setAttribute("min", today);
+
+                    // 当选择了出发日期时，自动更新返回日期
+                    departureDateInput.addEventListener("change", function() {
+                        // 获取选定的出发日期
+                        const selectedDepartureDate = this.value;
+
+                        // 将返回日期的最小值设为选定的出发日期，并自动填充为出发日期
+                        returnDateInput.setAttribute("min", selectedDepartureDate);
+                        returnDateInput.value = selectedDepartureDate;
+                    });
+
+                    // 添加点击Search按钮时跳转到搜索结果页面的功能
+                    document.getElementById("searchButton").addEventListener("click", function() {
+                        // 获取表单中的数据
+                        var fromCity = document.querySelector('input[placeholder="Enter departure city"]').value;
+                        var toCity = document.querySelector('input[placeholder="Enter destination city"]').value;
+                        var travellers = document.querySelector('select').value;
+                        var departureDate = document.getElementById("departureDate").value;
+                        var returnDate = document.getElementById("returnDate").value;
+
+                        // 模拟页面跳转，带上搜索的参数
+                        window.location.href = `/search-results?from=${fromCity}&to=${toCity}&travellers=${travellers}&departure=${departureDate}&return=${returnDate}`;
+                    });
+
+                </script>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
