@@ -39,7 +39,7 @@
     </div>
 
     <!-- Fixed Menu with Background Image -->
-    <div id="imageMenu" class="image-menu" style="width: {{ '150px' if current_username != 'Login / Sign up' else '200px' }};">
+    <div id="imageMenu" class="image-menu" style="width: {{ '150px' if current_username != 'Login / Sign up' else '200px' }} ; ">
         <ul>
             <li><a href="{{ url_for('flights') }}">Flights</a></li>
             <li><a href="{{ url_for('booking_history') }}">Booking History</a></li>

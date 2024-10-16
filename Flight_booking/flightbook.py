@@ -133,6 +133,12 @@ def home():
 @app.route('/passenger_info', methods=['GET', 'POST'])
 def passenger_info():
     if request.method == 'POST':
+        # Check if all required fields are provided
+        required_fields = ['first_name_1', 'last_name_1', 'email_1', 'phone_1', 'dob_1', 'address1_1', 'country_1', 'city_1', 'postal_code_1']
+        for field in required_fields:
+            if not request.form.get(field):
+                return "Missing required field", 400  # 返回错误信息
+        
         # Store passenger data in a dictionary
         passenger_data = {
             'number_of_passengers': request.form['passengers'],
@@ -155,23 +161,6 @@ def passenger_info():
             'bags': request.form['bags']
         }
 
-        # If there is a second passenger, add their details too
-        if request.form['passengers'] == "2":
-            passenger_data.update({
-                'first_name_2': request.form['first_name_2'],
-                'last_name_2': request.form['last_name_2'],
-                'middle_name_2': request.form.get('middle_name_2', ''),
-                'id_number_2': request.form.get('id_number_2', ''),
-                'dob_2': request.form['dob_2'],
-                'email_2': request.form.get('email_2', ''),
-                'phone_2': request.form.get('phone_2', ''),
-                'address1_2': request.form.get('address1_2', ''),
-                'address2_2': request.form.get('address2_2', ''),
-                'country_2': request.form.get('country_2', ''),
-                'city_2': request.form.get('city_2', ''),
-                'postal_code_2': request.form.get('postal_code_2', '')
-            })
-            
         # Append the passenger data to the list
         passengers_data_store.append(passenger_data)
 
@@ -179,9 +168,7 @@ def passenger_info():
         print("Stored Passenger Data:")
         for passenger in passengers_data_store:
             print(passenger)
-        # Save passenger data
         return "Passenger information submitted!"
-
     
     return render_template('booking.html')
 
