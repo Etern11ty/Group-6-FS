@@ -1,0 +1,205 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Fixed Image Menu */
+.image-menu {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1002;
+    background-color: rgba(173, 216, 230, 0.8); /* 淡蓝色背景 */
+    width: 200px;
+    height: 300px;
+    border-radius: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.image-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.image-menu li {
+    padding: 26px 20px;
+    border-bottom: 1px solid #ddd;
+    font-size: 18px;
+    text-align: center;
+    color: #000; /* 黑色字体 */
+}
+
+.image-menu li:last-child {
+    border-bottom: none;
+}
+
+.image-menu li a {
+    text-decoration: none;
+    color: #fff;
+    display: block;
+}
+
+.image-menu li:hover {
+    background-color: rgba(255, 255, 255, 0.3); /* 悬停时更亮的背景 */
+}
+
+/* Top navigation bar styles */
+.top-nav {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    z-index: 1003; /* 确保导航栏在最上层 */
+    font-size: 18px;
+    display: flex;
+    gap: 20px; /* 链接之间的间距 */
+    color: #000;
+}
+
+.top-nav a {
+    text-decoration: none;
+    color: black; /* 黑色字体 */
+}
+
+.top-nav a:hover {
+    text-decoration: underline; /* 悬停时显示下划线 */
+}
+
+/* Welcome Section with Background */
+.welcome-section {
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;  /* 垂直排列 */
+    justify-content: flex-start;  /* 元素靠上排列 */
+    align-items: center;
+    position: relative;
+    padding-top: 150px;  /* 向下移动150px，确保汉堡菜单不会被遮挡 */
+}
+
+.overlay {
+    background-color: transparent;
+    padding: 2rem;
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Welcome Image */
+.welcome-image {
+    max-width: 600px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+/* Booking Form */
+.booking-form {
+    background-color: rgba(255, 255, 255, 0.83);
+    padding: 1.5rem;
+    max-width: 800px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+
+.form-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.form-row .form-group:last-child {
+    margin-right: 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 16px;
+    color: #333;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Search Button */
+.search-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.search-button {
+    background-color: rgba(173, 216, 230, 0.9); /* 更改为浅蓝色背景 */
+    border: none;  /* 移除边框 */
+    border-radius: 10px;  /* 适当增加圆角 */
+    cursor: pointer;
+    width: 200px;  /* 增加按钮宽度 */
+    height: 75px;  /* 增加按钮高度 */
+    text-align: center;
+    color: white; /* 白色字体 */
+    font-size: 16px; /* 字体大小 */
+    font-weight: bold;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-button:hover {
+    background-color: rgba(0, 122, 255, 1);  /* 悬停时加深背景颜色 */
+}
+
+.search-button img {
+    width: 60%;
+    height: 60%;
+}
+
+/* Radio buttons for trip type */
+.radio-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.radio-row label {
+    margin-right: 15px;
+    font-size: 16px;
+    color: #333;
+}
+
+.radio-row input[type="radio"] {
+    margin-right: 5px;
+}
