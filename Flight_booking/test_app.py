@@ -67,10 +67,20 @@ class FlaskTestCase(unittest.TestCase):
         tester.post('/login', data=dict(username="aaa", password="aaa"), follow_redirects=True) 
         response = tester.post('/passenger_info', data=dict(
             passengers="1",
-            first_name_1="John",
-            last_name_1="", 
-            email_1="john@example.com",
-            phone_1="1234567890"
+            first_name_1="Jeffery",
+            last_name_1="",
+            email_1="Jeffery@example.com",
+            phone_1="1234567890",
+            dob_1="1990-01-01",
+            address1_1="123 Main St",
+            country_1="USA",
+            city_1="New York",
+            postal_code_1="10001",
+            em_first_name="James",
+            em_last_name="",
+            em_phone="1234567890",
+            em_email="James@example.com",
+            bags="2"
         ), follow_redirects=True)
         self.assertEqual(response.status_code, 400)
         self.assertIn(b'Missing required field', response.data) 
@@ -80,19 +90,19 @@ class FlaskTestCase(unittest.TestCase):
         tester.post('/login', data=dict(username="aaa", password="aaa"), follow_redirects=True)  
         response = tester.post('/passenger_info', data=dict(
             passengers="1",
-            first_name_1="John",
-            last_name_1="Doe",
-            email_1="john@example.com",
+            first_name_1="Jeffery",
+            last_name_1="Zhao",
+            email_1="Jeffery@example.com",
             phone_1="1234567890",
             dob_1="1990-01-01",
             address1_1="123 Main St",
             country_1="USA",
             city_1="New York",
             postal_code_1="10001",
-            em_first_name="Jane",
-            em_last_name="Doe",
+            em_first_name="James",
+            em_last_name="Zhou",
             em_phone="1234567890",
-            em_email="jane@example.com",
+            em_email="James@example.com",
             bags="2"
         ), follow_redirects=True)
         self.assertEqual(response.status_code, 200)  
