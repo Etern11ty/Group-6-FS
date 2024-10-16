@@ -1,0 +1,135 @@
+
+@import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+@import url("https://fonts.googleapis.com/css?family=Inter:600");
+
+
+* {
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+}
+
+
+.login-page {
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  background-image: url("/static/login/images/background.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+
+.login-page .menu-icon {
+  display: none;
+}
+
+
+.login-page .div {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 50px 40px; 
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  width: 500px;
+  min-height: 500px; 
+}
+
+
+.login-page .text-wrapper {
+  font-family: "Inter", Helvetica;
+  font-weight: 600;
+  font-size: 36px;
+  color: #000;
+  text-align: center;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+
+.login-page label {
+  font-family: "Inter", Helvetica;
+  font-weight: 500;
+  font-size: 18px;
+  margin-bottom: 5px;
+  align-self: flex-start; 
+  color: #000;
+}
+
+
+.login-page input {
+  width: 100%;
+  height: 50px;
+  padding: 10px;
+  font-size: 18px;
+  border: 1px solid #000;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+
+.login-page .search-button {
+  background-color: #0d70a7;
+  color: #fff;
+  font-size: 24px;
+  font-family: "Inter", Helvetica;
+  font-weight: 600;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  margin-top: 20px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  align-self: center; 
+}
+
+.login-page .search-button:hover {
+  background-color: #138fd5;
+}
+
+
+.login-page .p {
+  font-family: "Inter", Helvetica;
+  font-weight: 600;
+  font-size: 18px;
+  color: #000;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.login-page .p a {
+  color: #0000ee; 
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.login-page .line {
+  width: 100%;
+  height: 1px;
+  background-color: #000;
+  margin-top: 10px;
+}
