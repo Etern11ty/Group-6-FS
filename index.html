@@ -3,238 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Passenger Information</title>
+    <title>G6 Flights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='homepage/css/styles.css') }}">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-image: url("{{ url_for('static', filename='register/images/background.jpg') }}");;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            margin: 0;
-            padding: 20px;
+
+        .image-menu {
+            width: 200px; 
+            height: auto; 
         }
-        .container {
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            margin: auto;
+
+        .image-menu ul {
+            list-style-type: none;
+            padding: 0;
         }
-        h1 {
-            text-align: center;
+
+        .image-menu li {
+            margin: 10px 0;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-        }
-        input[type="text"], input[type="number"], input[type="email"], input[type="date"] {
-            width: calc(100% - 20px);
+
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
             padding: 10px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        .row {
-            display: flex;
-            justify-content: space-between;
-        }
-        .row .form-group {
-            width: 48%;
-        }
-        .buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .save-btn {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .details-btn {
-            background-color: #f0ad4e;
-            color: white;
-        }
-        .hidden {
-            display: none;
         }
     </style>
-    <script>
-        function togglePassengerInfo() {
-            var passengers = document.getElementById('passengers').value;
-            var secondPassenger = document.getElementById('secondPassenger');
-            
-            if (passengers == "2") {
-                secondPassenger.classList.remove('hidden');
-            } else {
-                secondPassenger.classList.add('hidden');
-            }
-        }
-    </script>
 </head>
 <body>
-    <div class="container">
-        <h1>Passenger Information</h1>
-        <form action="/passenger_info" method="POST">
-            # choose the number of passenger
-            <div class="form-group">
-                <label for="passengers">Number of Passengers</label>
-                <input type="number" id="passengers" name="passengers" value="1" min="1" max="2" onchange="togglePassengerInfo()">
-            </div>
 
-            # Second passenger's Information
-            <h2>Passenger 1</h2>
-            <div class="row">
-                <div class="form-group">
-                    <label for="first_name_1">First Name*</label>
-                    <input type="text" id="first_name_1" name="first_name_1" required>
-                </div>
-                <div class="form-group">
-                    <label for="last_name_1">Last Name*</label>
-                    <input type="text" id="last_name_1" name="last_name_1" required>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group">
-                    <label for="dob_1">Date of Birth*</label>
-                    <input type="date" id="dob_1" name="dob_1" required>
-                </div>
-                <div class="form-group">
-                    <label for="id_number_1">Government Issued ID*</label>
-                    <input type="text" id="id_number_1" name="id_number_1" required>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="form-group">
-                    <label for="email_1">Email*</label>
-                    <input type="email" id="email_1" name="email_1" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone_1">Phone Number*</label>
-                    <input type="text" id="phone_1" name="phone_1" required>
-                </div>
-            </div>
-
-            <h2>Address</h2>
-            <div class="form-group">
-                <label for="address1_1">Address Line 1*</label>
-                <input type="text" id="address1_1" name="address1_1" required>
-            </div>
-            <div class="form-group">
-                <label for="address2_1">Address Line 2</label>
-                <input type="text" id="address2_1" name="address2_1">
-            </div>
-            <div class="row">
-                <div class="form-group">
-                    <label for="country_1">Country*</label>
-                    <input type="text" id="country_1" name="country_1" required>
-                </div>
-                <div class="form-group">
-                    <label for="city_1">City*</label>
-                    <input type="text" id="city_1" name="city_1" required>
-                </div>
-                <div class="form-group">
-                    <label for="postal_code_1">Postal Code*</label>
-                    <input type="text" id="postal_code_1" name="postal_code_1" required>
-                </div>
-            </div>
-
-            # Second passenger's Information
-            <div id="secondPassenger" class="hidden">
-                <h2>Passenger 2</h2>
-                <div class="row">
-                    <div class="form-group">
-                        <label for="first_name_2">First Name*</label>
-                        <input type="text" id="first_name_2" name="first_name_2">
-                    </div>
-                    <div class="form-group">
-                        <label for="last_name_2">Last Name*</label>
-                        <input type="text" id="last_name_2" name="last_name_2">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group">
-                        <label for="dob_2">Date of Birth*</label>
-                        <input type="date" id="dob_2" name="dob_2">
-                    </div>
-                    <div class="form-group">
-                        <label for="id_number_2">Government Issued ID*</label>
-                        <input type="text" id="id_number_2" name="id_number_2">
-                    </div>
-                </div>
-
-                <h2>Address</h2>
-                <div class="form-group">
-                    <label for="address1_2">Address Line 1</label>
-                    <input type="text" id="address1_2" name="address1_2">
-                </div>
-                <div class="form-group">
-                    <label for="address2_2">Address Line 2</label>
-                    <input type="text" id="address2_2" name="address2_2">
-                </div>
-                <div class="row">
-                    <div class="form-group">
-                        <label for="country_2">Country</label>
-                        <input type="text" id="country_2" name="country_2">
-                    </div>
-                    <div class="form-group">
-                        <label for="city_2">City</label>
-                        <input type="text" id="city_2" name="city_2">
-                    </div>
-                    <div class="form-group">
-                        <label for="postal_code_2">Postal Code</label>
-                        <input type="text" id="postal_code_2" name="postal_code_2">
-                    </div>
-                </div>
-            </div>
-
-            <h2>Emergency Contact Information</h2>
-            <div class="row">
-                <div class="form-group">
-                    <label for="em_first_name">First name*</label>
-                    <input type="text" id="em_first_name" name="em_first_name" required>
-                </div>
-                <div class="form-group">
-                    <label for="em_last_name">Last name*</label>
-                    <input type="text" id="em_last_name" name="em_last_name" required>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group">
-                    <label for="em_phone">Phone number*</label>
-                    <input type="text" id="em_phone" name="em_phone" required>
-                </div>
-                <div class="form-group">
-                    <label for="em_email">Email address*</label>
-                    <input type="email" id="em_email" name="em_email" required>
-                </div>
-            </div>
-
-            <h2>Bag Information</h2>
-            <p>Each passenger is allowed one free carry-on bag and one personal item. First checked bag for each passenger is also free. Second bag check fees are waived for loyalty program members. See the full bag policy.</p>
-            <div class="form-group">
-                <label for="bags">Checked bags</label>
-                <input type="number" id="bags" name="bags" value="1" min="0">
-            </div>
-
-            <div class="buttons">
-                <button type="submit" class="save-btn">Save and submit</button>
-                <button type="button" class="details-btn">See details</button>
-            </div>
-        </form>
+    <!-- Top navigation bar -->
+    <div class="top-nav">
+        <a href="{{ url_for('login_page') }}">{{ current_username }}</a>
+        <a href="{{ url_for('passenger_info') }}">passenger information</a>
+        <a href="{{ url_for('cart') }}">Cart</a>
     </div>
+
+    <!-- Fixed Menu with Background Image -->
+    <div id="imageMenu" class="image-menu" style="width: {{ '150px' if current_username != 'Login / Sign up' else '200px' }} ; ">
+        <ul>
+            <li><a href="{{ url_for('flights') }}">Flights</a></li>
+            <li><a href="{{ url_for('booking_history') }}">Booking History</a></li>
+            {% if current_username == "Login / Sign up" %}
+            <li><a href="{{ url_for('login_page') }}">Login</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main content with background image -->
+    <section class="welcome-section" style="background-image: url('{{ url_for('static', filename='homepage/images/Background.jpg') }}');">
+        <div class="overlay">
+            <img src="{{ url_for('static', filename='homepage/images/Welcome to G6 flights.png') }}" alt="Welcome" class="welcome-image">
+            <div class="booking-form">
+                <h2 class="form-title">Booking process</h2>
+
+                <!-- Trip Type Selection -->
+                <form method="POST" action="/search-results">
+                    <div class="form-row radio-row">
+                        <label>
+                            <input type="radio" name="trip" value="oneway" checked> Oneway
+                        </label>
+                        <label>
+                            <input type="radio" name="trip" value="roundtrip"> Round trip
+                        </label>
+                    </div>
+
+                    <!-- Form Fields -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>From:</label>
+                            <input type="text" name="from_city" placeholder="Enter departure city">
+                        </div>
+                        <div class="form-group">
+                            <label>To:</label>
+                            <input type="text" name="to_city" placeholder="Enter destination city">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Travellers and class:</label>
+                            <select name="travellers_class">
+                                <option value="1 Traveller">1 Traveller</option>
+                                <option value="2 Travellers">2 Travellers</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Departure Date:</label>
+                            <input type="date" name="departure_date" id="departureDate" min="">
+                        </div>
+                        <div class="form-group return-date" id="returnDateGroup">
+                            <label>Return Date:</label>
+                            <input type="date" name="return_date" id="returnDate" min="">
+                        </div>
+                    </div>
+
+                    <!-- Search Button -->
+                    <div class="search-group">
+                        <button type="submit" class="search-button">
+                            <img src="{{ url_for('static', filename='homepage/images/Search.png') }}" alt="Search">
+                        </button>
+                    </div>
+                </form>
+
+                <script>
+                    const today = new Date().toISOString().split('T')[0];
+
+                    const departureDateInput = document.getElementById("departureDate");
+                    const returnDateInput = document.getElementById("returnDate");
+
+                    departureDateInput.setAttribute("min", today);
+                    returnDateInput.setAttribute("min", today);
+
+                    departureDateInput.addEventListener("change", function() {
+                        const selectedDepartureDate = this.value;
+                        returnDateInput.setAttribute("min", selectedDepartureDate);
+                        returnDateInput.value = selectedDepartureDate;
+                    });
+
+                    const tripTypeRadios = document.querySelectorAll('input[name="trip"]');
+                    tripTypeRadios.forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            const returnDateGroup = document.getElementById('returnDateGroup');
+                            if (this.value === 'oneway') {
+                                returnDateGroup.style.display = 'none';
+                            } else {
+                                returnDateGroup.style.display = 'block';
+                            }
+                        });
+                    });
+
+                    document.getElementById('returnDateGroup').style.display = 'none';
+                </script>
+            </div>
+        </div>
+    </section>
+
 </body>
 </html>
-
-
