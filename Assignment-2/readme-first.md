@@ -10,7 +10,18 @@ This is a flight booking system that offers functionalities such as user registr
     cd FlightBooking
     ```
 
-2. **Create a virtual environment and install dependencies**:
+2. **Python & Dependencies Version Requirements**
+    - **Python Version**: 
+      - This project is compatible with **Python 3.13** the require version is python 3.8 or later
+      - You can check your Python version using:
+        ```bash
+        python --version
+        ```
+    - **Required Packages & Versions**:
+      - **Flask**: 2.2.5 
+      - **Pytest**: 7.4.0
+
+3. **Create a virtual environment and install dependencies**:
     - **Create a virtual environment**:
         ```bash
         python -m venv venv

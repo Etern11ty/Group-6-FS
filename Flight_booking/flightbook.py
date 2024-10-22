@@ -9,6 +9,22 @@ password_list = ["aaa", "123"]
 email_list = ["aaa@gmail.com", "123@gmail.com"]
 
 
+flight_list = [
+    {"flight_number": "FL001", "departure": "Shanghai", "destination": "Toronto", "date": "2024-11-10"},
+    {"flight_number": "FL002", "departure": "Beijing", "destination": "New York", "date": "2024-11-12"},
+    {"flight_number": "FL003", "departure": "Tokyo", "destination": "Los Angeles", "date": "2024-11-15"},
+    {"flight_number": "FL004", "departure": "Seoul", "destination": "San Francisco", "date": "2024-11-18"},
+    {"flight_number": "FL005", "departure": "Paris", "destination": "London", "date": "2024-11-20"},
+    {"flight_number": "FL006", "departure": "Sydney", "destination": "Melbourne", "date": "2024-11-22"},
+    {"flight_number": "FL007", "departure": "Berlin", "destination": "Amsterdam", "date": "2024-11-25"},
+    {"flight_number": "FL008", "departure": "Rome", "destination": "Madrid", "date": "2024-11-27"},
+    {"flight_number": "FL009", "departure": "Dubai", "destination": "Doha", "date": "2024-12-01"},
+    {"flight_number": "FL010", "departure": "Delhi", "destination": "Mumbai", "date": "2024-12-03"},
+]
+
+
+
+
 @app.route('/')
 def index():
     # session['current_username'] = 'aaa'
@@ -61,10 +77,27 @@ def search_results():
     print(f"Departure Date: {departure_date}")
     print(f"Return Date: {return_date}")
 
-    if trip_type == "oneway" :
-        info = f"{travellers} from {from_city} to {to_city} at {departure_date}. "
+
+
+
+    matching_flights = []
+    for flight in flight_list:
+        if (flight["departure"] == from_city and 
+            flight["destination"] == to_city and 
+            flight["date"] == departure_date):
+            matching_flights.append(flight)
+
+    if matching_flights:
+        flight_info = ", ".join([f'Flight {flight["flight_number"]}' for flight in matching_flights])
+        if trip_type == "oneway":
+            info = f"{travellers} from {from_city} to {to_city} on {departure_date}. Matching flights: {flight_info}."
+        else:
+            info = f"{travellers} from {from_city} to {to_city} on {departure_date}, returning on {return_date}. Matching flights: {flight_info}."
     else:
-        info = f"{travellers} from {from_city} to {to_city} in {departure_date} and return in {return_date} "
+        if trip_type == "oneway":
+            info = f"No flights found for {travellers} from {from_city} to {to_city} on {departure_date}."
+        else:
+            info = f"No flights found for {travellers} from {from_city} to {to_city} on {departure_date} and returning on {return_date}."
 
     return info
 
