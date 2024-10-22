@@ -60,6 +60,46 @@ This is a flight booking system that offers functionalities such as user registr
         ```
     - Open your browser and navigate to `http://127.0.0.1:5000/` to access the application.
 
+
+### Post-Launch Operations
+
+1. **Accessing the Homepage**
+   - Open the browser and navigate to `http://127.0.0.1:5000/` or the URL displayed after launching the project. You should see the homepage with a welcome screen.
+
+2. **Login/Registration**
+   - **Login**:
+     - Click the “Login / Sign up” link at the top-right corner and enter an existing username and password to log in.
+     - Test credentials:
+       - Username: `aaa`
+       - Password: `aaa`
+     - If the login is successful, you will be redirected to the homepage, and the username will be displayed at the top-right corner.
+   - **Registration**:
+     - If you want to test the registration feature, click the “Login / Sign up” link and choose the registration option.
+     - Enter a new username, password, confirm the password, and enter an email address. Then, submit the registration form.
+     - If the registration is successful, you will be redirected to the homepage.
+
+3. **Flight Search**
+   - In the booking form on the homepage, enter the departure city, destination city, departure date, and return date (if "Round trip" is selected).
+   - Select the number of travelers and class type, then click the "Search" button.
+   - The system will display a list of available flights matching the search criteria (if any).
+
+4. **Viewing Booking History**
+   - After logging in, click the “Booking History” link on the left-side menu to view all booked flight records.
+   - If there are no booking records, the system will display a message indicating no data available.
+
+5. **Logout**
+   - Click the “Logout” link at the top-right corner to log out. The system will redirect you to the homepage.
+
+### Running Test Scripts
+
+1. **Execute all test cases**
+   - After activating the virtual environment, run the following command to execute the test scripts:
+     ```bash
+     pytest test_app.py
+     ```
+   - The results will be displayed in the console, and you can take screenshots as needed to demonstrate whether the tests passed or failed.
+
+
 ## Running Tests
 1. **Run unit tests using `unittest`**:
     ```bash
