@@ -1,6 +1,22 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from supabase import create_client, Client
+import os
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path="key.env")
+
+supabase_url = os.getenv("SUPABASE_URL")
+supabase_key = os.getenv("SUPABASE_KEY")
+
 
 app = Flask(__name__, static_folder='static')
+
+# supabase: Client = create_client(supabase_url, supabase_key)
+
+# # test database can work or not
+# response = supabase.table("user_account").select("*").execute()
+# print(response.data) 
+
 
 app.secret_key = 'aa2233'
 
