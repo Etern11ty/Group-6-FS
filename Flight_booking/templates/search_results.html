@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 0;
+        }
+        h1 {
+            color: #333;
+        }
+        .info-section {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .flight-info {
+            white-space: pre-wrap; /* 确保 \n\n 被视为换行 */
+            margin: 10px 0;
+        }
+        .no-flight {
+            color: #b33;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Flight Search Results</h1>
+
+    <div class="info-section">
+        <p class="flight-info">{{ info }}</p>
+    </div>
+
+    <form action="/" method="get">
+        <button type="submit">Back to Search</button>
+    </form>
+
+</body>
+</html>

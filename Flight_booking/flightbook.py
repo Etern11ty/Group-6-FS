@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 load_dotenv(dotenv_path="key.env")
 
@@ -11,11 +12,13 @@ supabase_key = os.getenv("SUPABASE_KEY")
 
 app = Flask(__name__, static_folder='static')
 
-# supabase: Client = create_client(supabase_url, supabase_key)
+supabase: Client = create_client(supabase_url, supabase_key)
 
-# # test database can work or not
-# response = supabase.table("user_account").select("*").execute()
-# print(response.data) 
+# test database can work or not
+response = supabase.table("user_account").select("*").execute()
+
+# test database can work or not
+response2 = supabase.table("flight_information").select("*").execute()
 
 
 app.secret_key = 'aa2233'
@@ -25,18 +28,7 @@ password_list = ["aaa", "123"]
 email_list = ["aaa@gmail.com", "123@gmail.com"]
 
 
-flight_list = [
-    {"flight_number": "FL001", "departure": "Shanghai", "destination": "Toronto", "date": "2024-11-10"},
-    {"flight_number": "FL002", "departure": "Beijing", "destination": "New York", "date": "2024-11-12"},
-    {"flight_number": "FL003", "departure": "Tokyo", "destination": "Los Angeles", "date": "2024-11-15"},
-    {"flight_number": "FL004", "departure": "Seoul", "destination": "San Francisco", "date": "2024-11-18"},
-    {"flight_number": "FL005", "departure": "Paris", "destination": "London", "date": "2024-11-20"},
-    {"flight_number": "FL006", "departure": "Sydney", "destination": "Melbourne", "date": "2024-11-22"},
-    {"flight_number": "FL007", "departure": "Berlin", "destination": "Amsterdam", "date": "2024-11-25"},
-    {"flight_number": "FL008", "departure": "Rome", "destination": "Madrid", "date": "2024-11-27"},
-    {"flight_number": "FL009", "departure": "Dubai", "destination": "Doha", "date": "2024-12-01"},
-    {"flight_number": "FL010", "departure": "Delhi", "destination": "Mumbai", "date": "2024-12-03"},
-]
+flight_list = supabase.table("flight_information").select("*").execute().data
 
 
 
@@ -57,7 +49,7 @@ def flights():
 
 @app.route('/booking-history')
 def booking_history():
-    return 'booking_history.html'
+    return render_template('booking_history.html')
 
 
 @app.route('/login_page')
@@ -76,15 +68,14 @@ def logout():
     return redirect(url_for('index'))
 
 
-
 @app.route('/search-results', methods=['POST'])
 def search_results():
     trip_type = request.form.get('trip')
     from_city = request.form['from_city']
     to_city = request.form['to_city']
     travellers = request.form['travellers_class']
-    departure_date = request.form['departure_date']
-    return_date = request.form.get('return_date', None)
+    departure_date = request.form['departure_date'] or datetime.now().strftime('%Y-%m-%d')  # 默认今天的日期
+    return_date = request.form.get('return_date') or (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')  # 默认一周后
 
     print(f"Trip Type: {trip_type}")
     print(f"From: {from_city}")
@@ -92,31 +83,54 @@ def search_results():
     print(f"Travellers: {travellers}")
     print(f"Departure Date: {departure_date}")
     print(f"Return Date: {return_date}")
+    
+    info = ""
 
+    # 查找去程航班
+    response = supabase.table("flight_information").select("flight_number, departure_time, arrival_time") \
+        .eq("departure", from_city) \
+        .eq("destination", to_city) \
+        .eq("date", departure_date) \
+        .execute()
+    matching_flights = response.data if response.data else []
 
+    # 去程航班信息
+    outbound_info = "\n\n".join([f'Flight {flight["flight_number"]} - Departure: {flight["departure_time"]}, Arrival: {flight["arrival_time"]}' for flight in matching_flights])
 
-
-    matching_flights = []
-    for flight in flight_list:
-        if (flight["departure"] == from_city and 
-            flight["destination"] == to_city and 
-            flight["date"] == departure_date):
-            matching_flights.append(flight)
-
-    if matching_flights:
-        flight_info = ", ".join([f'Flight {flight["flight_number"]}' for flight in matching_flights])
-        if trip_type == "oneway":
-            info = f"{travellers} from {from_city} to {to_city} on {departure_date}. Matching flights: {flight_info}."
+    if trip_type == "oneway":
+        # 单程航班信息输出
+        if matching_flights:
+            info = f"{travellers} from {from_city} to {to_city} on {departure_date}.\n\nMatching flights:\n\n{outbound_info}."
         else:
-            info = f"{travellers} from {from_city} to {to_city} on {departure_date}, returning on {return_date}. Matching flights: {flight_info}."
-    else:
-        if trip_type == "oneway":
             info = f"No flights found for {travellers} from {from_city} to {to_city} on {departure_date}."
+
+    elif trip_type != "oneway":
+        # 查找回程航班
+        response_return = supabase.table("flight_information").select("flight_number, departure_time, arrival_time") \
+            .eq("departure", to_city) \
+            .eq("destination", from_city) \
+            .eq("date", return_date) \
+            .execute()
+        return_flights = response_return.data if response_return.data else []
+
+        # 回程航班信息
+        return_info = "\n\n".join([f'Flight {flight["flight_number"]} - Departure: {flight["departure_time"]}, Arrival: {flight["arrival_time"]}' for flight in return_flights])
+
+        if matching_flights:
+            # 如果有去程航班，先显示去程信息
+            if return_flights:
+                # 去程和回程都有匹配航班
+                info = f"{travellers} from {from_city} to {to_city} on {departure_date}, returning on {return_date}.\n\nOutbound flights:\n\n{outbound_info}.\n\nReturn flights:\n\n{return_info}."
+            else:
+                # 有去程但没有回程航班
+                info = f"{travellers} from {from_city} to {to_city} on {departure_date}.\n\nOutbound flights:\n\n{outbound_info}.\n\nNo return flights found for {travellers} from {to_city} to {from_city} on {return_date}."
         else:
+            # 没有去程航班
             info = f"No flights found for {travellers} from {from_city} to {to_city} on {departure_date} and returning on {return_date}."
 
-    return info
-
+    # 使用 render_template 渲染 HTML 页面
+    return render_template('search_results.html', info=info)
+    # return info
 
 @app.route('/login', methods=['POST'])
 def login():
