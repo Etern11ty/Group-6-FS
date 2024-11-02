@@ -23,9 +23,9 @@ response2 = supabase.table("flight_information").select("*").execute()
 
 app.secret_key = 'aa2233'
 
-username_list = ["aaa", "123"]
-password_list = ["aaa", "123"]
-email_list = ["aaa@gmail.com", "123@gmail.com"]
+# username_list = ["aaa", "123"]
+# password_list = ["aaa", "123"]
+# email_list = ["aaa@gmail.com", "123@gmail.com"]
 
 
 flight_list = supabase.table("flight_information").select("*").execute().data
@@ -137,13 +137,13 @@ def login():
 
     username = request.form['username']
     password = request.form['password']
+
+    response = supabase.table("user_account").select("*").eq("Username", username).execute()
     
-    if username in username_list and password in password_list:
-        user_index = username_list.index(username)
-        if password_list[user_index] == password:
-
+    if response.data:
+        user = response.data[0]
+        if user["Password"] == password:
             session['current_username'] = username
-
             return redirect(url_for('index'))
         
     session['error'] = "Invalid username or password"  
@@ -160,17 +160,23 @@ def register():
 
         if password != confirm_password:
             return render_template('register.html', error="Passwords do not match")
-        elif username in username_list:
+        
+        username_check = supabase.table("user_account").select("*").eq("Username", username).execute()
+        if username_check.data:
             return render_template('register.html', error="Username is occupied")
-        elif email in email_list:
+        
+        email_check = supabase.table("user_account").select("*").eq("emailaddress", email).execute()
+        if email_check.data:
             return render_template('register.html', error="Email is occupied")
 
+        user_data = {
+            "Username": username,
+            "Password": password,
+            "emailaddress": email,
+            "created_time": "now()" 
+        }
 
-        username_list.append(username)
-        password_list.append(password)
-        email_list.append(email)
-
-        print(username_list, password_list, email_list)
+        supabase.table("user_account").insert(user_data).execute()
 
         session.pop('error', None)
 
