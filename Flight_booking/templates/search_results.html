@@ -10,12 +10,17 @@
             line-height: 1.6;
             margin: 20px;
             padding: 0;
+            background-image: url("{{ url_for('static', filename='homepage/images/Background.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
         }
         h1 {
             color: #333;
         }
         .info-section {
-            background-color: #f9f9f9;
+            background-color: rgba(255, 255, 255, 0.8); /* Increased transparency */
             border: 1px solid #ddd;
             padding: 20px;
             margin-bottom: 20px;
@@ -33,7 +38,7 @@
             padding: 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.75); /* Adjusted transparency for items */
             display: flex;
             justify-content: space-between;
             align-items: center;
