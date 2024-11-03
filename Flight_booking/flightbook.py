@@ -74,63 +74,66 @@ def search_results():
     from_city = request.form['from_city']
     to_city = request.form['to_city']
     travellers = request.form['travellers_class']
-    departure_date = request.form['departure_date'] or datetime.now().strftime('%Y-%m-%d')  # 默认今天的日期
-    return_date = request.form.get('return_date') or (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')  # 默认一周后
+    departure_date = request.form['departure_date'] or datetime.now().strftime('%Y-%m-%d')
+    return_date = request.form.get('return_date') or (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
 
-    print(f"Trip Type: {trip_type}")
-    print(f"From: {from_city}")
-    print(f"To: {to_city}")
-    print(f"Travellers: {travellers}")
-    print(f"Departure Date: {departure_date}")
-    print(f"Return Date: {return_date}")
-    
-    info = ""
-
-    # 查找去程航班
-    response = supabase.table("flight_information").select("flight_number, departure_time, arrival_time") \
+    # Fetch outbound flights with departure and destination details
+    response = supabase.table("flight_information").select("flight_number, departure, destination, departure_time, arrival_time") \
         .eq("departure", from_city) \
         .eq("destination", to_city) \
         .eq("date", departure_date) \
         .execute()
     matching_flights = response.data if response.data else []
 
-    # 去程航班信息
-    outbound_info = "\n\n".join([f'Flight {flight["flight_number"]} - Departure: {flight["departure_time"]}, Arrival: {flight["arrival_time"]}' for flight in matching_flights])
+    # Fetch prices and update flight data
+    for flight in matching_flights:
+        flight_number = flight["flight_number"]
+        price_response = supabase.table("price").select("price").eq("flight_number", flight_number).execute()
+        price_data = price_response.data
+        flight["price"] = price_data[0]["price"] if price_data else "N/A"
 
-    if trip_type == "oneway":
-        # 单程航班信息输出
-        if matching_flights:
-            info = f"{travellers} from {from_city} to {to_city} on {departure_date}.\n\nMatching flights:\n\n{outbound_info}."
-        else:
-            info = f"No flights found for {travellers} from {from_city} to {to_city} on {departure_date}."
-
-    elif trip_type != "oneway":
-        # 查找回程航班
-        response_return = supabase.table("flight_information").select("flight_number, departure_time, arrival_time") \
+    # If round trip, fetch return flights similarly
+    return_flights = []
+    if trip_type != "oneway":
+        response_return = supabase.table("flight_information").select("flight_number, departure, destination, departure_time, arrival_time") \
             .eq("departure", to_city) \
             .eq("destination", from_city) \
             .eq("date", return_date) \
             .execute()
         return_flights = response_return.data if response_return.data else []
 
-        # 回程航班信息
-        return_info = "\n\n".join([f'Flight {flight["flight_number"]} - Departure: {flight["departure_time"]}, Arrival: {flight["arrival_time"]}' for flight in return_flights])
+        # Fetch prices for return flights
+        for flight in return_flights:
+            flight_number = flight["flight_number"]
+            price_response = supabase.table("price").select("price").eq("flight_number", flight_number).execute()
+            price_data = price_response.data
+            flight["price"] = price_data[0]["price"] if price_data else "N/A"
 
-        if matching_flights:
-            # 如果有去程航班，先显示去程信息
-            if return_flights:
-                # 去程和回程都有匹配航班
-                info = f"{travellers} from {from_city} to {to_city} on {departure_date}, returning on {return_date}.\n\nOutbound flights:\n\n{outbound_info}.\n\nReturn flights:\n\n{return_info}."
-            else:
-                # 有去程但没有回程航班
-                info = f"{travellers} from {from_city} to {to_city} on {departure_date}.\n\nOutbound flights:\n\n{outbound_info}.\n\nNo return flights found for {travellers} from {to_city} to {from_city} on {return_date}."
-        else:
-            # 没有去程航班
-            info = f"No flights found for {travellers} from {from_city} to {to_city} on {departure_date} and returning on {return_date}."
+    return render_template(
+        'search_results.html', 
+        matching_flights=matching_flights,
+        return_flights=return_flights,
+        travellers=travellers,
+        from_city=from_city,
+        to_city=to_city,
+        departure_date=departure_date,
+        return_date=return_date,
+        trip_type=trip_type
+    )
 
-    # 使用 render_template 渲染 HTML 页面
-    return render_template('search_results.html', info=info)
-    # return info
+@app.route('/flight_detail', methods=['POST'])
+def flight_detail():
+    flight_number = request.form['flight_number']
+    
+    # 查找航班的详细信息
+    response = supabase.table("flight_information").select("*").eq("flight_number", flight_number).execute()
+    flight_info = response.data[0] if response.data else None
+
+    # 从价格数据库获取航班价格
+    price_response = supabase.table("price").select("price").eq("flight_number", flight_number).execute()
+    flight_price = price_response.data[0]['price'] if price_response.data else "N/A"
+
+    return render_template('flight_detail.html', flight=flight_info, price=flight_price)
 
 @app.route('/login', methods=['POST'])
 def login():
