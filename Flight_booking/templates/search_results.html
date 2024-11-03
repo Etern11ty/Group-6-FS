@@ -22,11 +22,36 @@
             border-radius: 8px;
         }
         .flight-info {
-            white-space: pre-wrap; /* 确保 \n\n 被视为换行 */
+            white-space: pre-wrap;
             margin: 10px 0;
         }
         .no-flight {
             color: #b33;
+        }
+        .flight-item {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .flight-details {
+            color: #333;
+        }
+        .select-button {
+            padding: 8px 12px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .select-button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -35,7 +60,22 @@
     <h1>Flight Search Results</h1>
 
     <div class="info-section">
-        <p class="flight-info">{{ info }}</p>
+        {% if matching_flights %}
+            {% for flight in matching_flights %}
+                <div class="flight-item">
+                    <div class="flight-details">
+                        <pre>Flight {{ flight.flight_number }} - Departure: {{ flight.departure }} to {{ flight.destination }}, 
+Departure Time: {{ flight.departure_time }}, Arrival: {{ flight.arrival_time }}, Price: {{ flight.price }}</pre>
+                    </div>
+                    <form action="{{ url_for('flight_detail') }}" method="post" style="display: inline;">
+                        <input type="hidden" name="flight_number" value="{{ flight.flight_number }}">
+                        <button type="submit" class="select-button">Select</button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% else %}
+            <pre class="no-flight">{{ info }}</pre>
+        {% endif %}
     </div>
 
     <form action="/" method="get">
