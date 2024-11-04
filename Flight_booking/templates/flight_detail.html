@@ -53,6 +53,31 @@
             justify-content: space-between;
             margin-top: 20px;
         }
+        .time-info .line-with-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            position: relative;
+            height: 2px;
+            background-color: #333;
+            margin: 0 10px;
+        }
+        .line-with-dots::before,
+        .line-with-dots::after {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background-color: #333;
+            border-radius: 50%;
+            position: absolute;
+        }
+        .line-with-dots::before {
+            left: -8px; 
+        }
+        .line-with-dots::after {
+            right: -8px;
+        }
         .price-summary p {
             margin: 5px 0;
         }
@@ -97,22 +122,19 @@
     <h1>Trip Review</h1>
 
     <div class="details-section">
-
+        <!-- Trip Details Section -->
         <div class="trip-details">
-            <h2>Departing flight<h2>
+            <h2>Departing flight</h2>
             <p>{{ flight.departure }} → {{ flight.destination }}</p>
             <p>{{ flight.date }}</p>
             <div class="time-info">
                 <div>
-                    <strong>{{ flight.departure_time }}</strong> <br>
+                    <strong>{{ flight.departure_time }} (local time)</strong> <br>
                     {{ flight.origin }}
                 </div>
+                <div class="line-with-dots"></div> 
                 <div>
-                    <p><small>{{ flight.duration }}</small></p>
-                </div>
-                <div class="time-line"></div>
-                <div>
-                    <strong>{{ flight.arrival_time }}</strong> <br>
+                    <strong>{{ flight.arrival_time }}  (local time)</strong> <br>
                     {{ flight.dest }}
                 </div>
             </div>
@@ -121,8 +143,8 @@
         <!-- Price Summary Section -->
         <div class="price-summary">
             <h2>Price summary</h2>
-            <p>Air transportation charges: <span>${{price}}</span></p>
-            <p>Taxes, fees, and charges: <span>${{ (price*0.19) | round(2)}}</span></p>
+            <p>Air transportation charges: <span>${{ price }}</span></p>
+            <p>Taxes, fees, and charges: <span>${{ (price * 0.19) | round(2) }}</span></p>
             <hr>
             <p class="price-total">Grand total: <span>${{ (price * 1.19) | round(2) }}</span></p>
         </div>

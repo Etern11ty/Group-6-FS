@@ -12,32 +12,20 @@ supabase_key = os.getenv("SUPABASE_KEY")
 
 supabase: Client = create_client(supabase_url, supabase_key)
 
-birthday = datetime.strptime('2023-1-1', "%Y-%m-%d").strftime("%Y-%m-%d")
 
-print(birthday)
+booking_data = {
+        "username": 'abc',
+        "flightnumber": 'flight_info.get('')',
+        "purchase_time": "now()",
+        "first_name": 'passenger_info.get('')',
+        "last_name": 'passenger_info.get('')',
+    }
 
-passenger_data = {
-    'username': 'aaaa',
-    'firstname': 'Wanting',
-    'lastname': 'Huang',
-    'idnumber': '123456',
-    'emailaddress': 'ttrbbkry@gmail.com',
-    'phone': '1234567891',
-    'birthday': '2023-01-01',
-    'addressline1': '101 st',
-    'addressline2': '102 st',
-    'country': 'Canada',
-    'city': 'Kingston',
-    'postalcode': 'k7l 1c5',
-    'emergfirstname': 'amanda',
-    'emerglastname': 'xiang',
-    'emergphone': '9876543211',
-    'emergemailaddress': '20wh18@queensu.ca'
-}
-
+    # Insert data into Supabase `bookinghistory` table
 try:
-    # 尝试插入数据
-    response = supabase.table("passenger_information").insert(passenger_data).execute()
+    response = supabase.table("bookinghistory").insert(booking_data).execute()
+    if response.error:
+        print(f"Error saving booking: {response.error}")  # 打印错误信息
 
     # 打印完整的响应对象以检查结构
     print("Supabase 完整响应:", response)

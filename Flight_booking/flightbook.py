@@ -126,13 +126,16 @@ def search_results():
 def flight_detail():
     flight_number = request.form['flight_number']
     
-
     response = supabase.table("flight_information").select("*").eq("flight_number", flight_number).execute()
     flight_info = response.data[0] if response.data else None
 
-
     price_response = supabase.table("price").select("price").eq("flight_number", flight_number).execute()
     flight_price = price_response.data[0]['price'] if price_response.data else "N/A"
+
+    flight_info['price'] = flight_price
+    session['flight_info'] = flight_info
+
+    # use flight_info = json.loads(session.get('flight_info', '{}')) to get info
 
     return render_template('flight_detail.html', flight=flight_info, price=flight_price)
 
@@ -246,6 +249,7 @@ def passenger_info():
             'emergemailaddress': request.form['em_email'],
         }
         
+        session['passenger_data'] = passenger_data
                 # insert passenger info into supabase
         try:
             response = supabase.table("passenger_information").upsert(passenger_data, on_conflict=["username"]).execute()
@@ -261,7 +265,7 @@ def passenger_info():
                 else:
                     return "Error retrieving updated data", 500
         except Exception as e:
-            return f"Data submitted successfully!", 500
+            return render_template('payment.html', flight = session.get('flight_info'), passenger = passenger_data)
 
     # if GET request，return passenger info page
     try:
@@ -275,6 +279,57 @@ def passenger_info():
             return render_template('booking.html', existing_data=None)
     except Exception as e:
         return f"An error occurred while fetching data: {str(e)}", 500
+
+@app.route('/process_payment', methods=['POST'])
+def process_payment():
+    # Retrieve necessary data from the session
+    flight_info = session.get('flight_info')
+    passenger_info = session.get('passenger_data')  # Assumes passenger_data includes first/last names
+    
+    if not flight_info or not passenger_info:
+        return "Missing booking data", 400
+
+    # Prepare data for insertion
+    booking_data = {
+        "username": session.get('current_username'),
+        "flightnumber": flight_info.get('flight_number'),
+        "purchase_time": 'now()',
+        "first_name": passenger_info.get('firstname'),
+        "last_name": passenger_info.get('lastname'),
+    }
+
+    print(booking_data)
+
+    # Insert data into Supabase `bookinghistory` table
+    supabase.table("bookinghistory").insert(booking_data).execute()
+
+
+    # Redirect to the paymentsuccess page
+    return redirect(url_for('paymentsuccess'))
+
+@app.route('/paymentsuccess')
+def paymentsuccess():
+    # Retrieve necessary data from the session
+    flight_info = session.get('flight_info')
+    passenger_info = session.get('passenger_data')  # Assumes passenger_data includes first/last names
+    
+    if not flight_info or not passenger_info:
+        return "Missing booking data", 400
+
+    print("Flight info:", flight_info)
+    print("Passenger info:", passenger_info)
+
+    return render_template('paymentsuccess.html', flight_info=flight_info, passenger_info=passenger_info)
+
+
+
+@app.route('/view_booking_history')
+def view_booking_history():
+    return render_template('booking_history.html')
+
+@app.route('/home')
+def go_home():
+    return redirect(url_for('index'))
 
 
 
