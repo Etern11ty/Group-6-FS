@@ -79,7 +79,7 @@ def search_results():
     return_date = request.form.get('return_date') or (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
 
     # Fetch outbound flights with departure and destination details
-    response = supabase.table("flight_information").select("flight_number, departure, destination, departure_time, arrival_time") \
+    response = supabase.table("flight_information").select("flight_number, departure, destination, departure_time, arrival_time,aircraft, dest, origin") \
         .eq("departure", from_city) \
         .eq("destination", to_city) \
         .eq("date", departure_date) \
@@ -96,7 +96,7 @@ def search_results():
     # If round trip, fetch return flights similarly
     return_flights = []
     if trip_type != "oneway":
-        response_return = supabase.table("flight_information").select("flight_number, departure, destination, departure_time, arrival_time") \
+        response_return = supabase.table("flight_information").select("flight_number, departure, destination, departure_time, arrival_time,aircraft, dest, origin") \
             .eq("departure", to_city) \
             .eq("destination", from_city) \
             .eq("date", return_date) \
@@ -126,11 +126,11 @@ def search_results():
 def flight_detail():
     flight_number = request.form['flight_number']
     
-    # 查找航班的详细信息
+
     response = supabase.table("flight_information").select("*").eq("flight_number", flight_number).execute()
     flight_info = response.data[0] if response.data else None
 
-    # 从价格数据库获取航班价格
+
     price_response = supabase.table("price").select("price").eq("flight_number", flight_number).execute()
     flight_price = price_response.data[0]['price'] if price_response.data else "N/A"
 
