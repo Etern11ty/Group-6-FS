@@ -6,21 +6,17 @@
     <title>G6 Flights</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='homepage/css/styles.css') }}">
     <style>
-
         .image-menu {
             width: 200px; 
             height: auto; 
         }
-
         .image-menu ul {
             list-style-type: none;
             padding: 0;
         }
-
         .image-menu li {
             margin: 10px 0;
         }
-
         .top-nav {
             display: flex;
             justify-content: flex-end;
@@ -72,11 +68,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>From:</label>
-                            <input type="text" name="from_city" placeholder="Enter departure city">
+                            <input type="text" name="from_city" placeholder="Enter departure city" required>
                         </div>
                         <div class="form-group">
                             <label>To:</label>
-                            <input type="text" name="to_city" placeholder="Enter destination city">
+                            <input type="text" name="to_city" placeholder="Enter destination city" required>
                         </div>
                     </div>
 
@@ -93,11 +89,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Departure Date:</label>
-                            <input type="date" name="departure_date" id="departureDate" min="">
+                            <input type="date" name="departure_date" id="departureDate" min="" required>
                         </div>
                         <div class="form-group return-date" id="returnDateGroup">
                             <label>Return Date:</label>
-                            <input type="date" name="return_date" id="returnDate" min="">
+                            <input type="date" name="return_date" id="returnDate" min="" required>
                         </div>
                     </div>
 
@@ -117,6 +113,10 @@
 
                     departureDateInput.setAttribute("min", today);
                     returnDateInput.setAttribute("min", today);
+                    
+                    // Set the default value to today's date
+                    departureDateInput.value = today;
+                    returnDateInput.value = today;
 
                     departureDateInput.addEventListener("change", function() {
                         const selectedDepartureDate = this.value;
@@ -130,13 +130,16 @@
                             const returnDateGroup = document.getElementById('returnDateGroup');
                             if (this.value === 'oneway') {
                                 returnDateGroup.style.display = 'none';
+                                returnDateInput.removeAttribute("required");
                             } else {
                                 returnDateGroup.style.display = 'block';
+                                returnDateInput.setAttribute("required", true);
                             }
                         });
                     });
 
                     document.getElementById('returnDateGroup').style.display = 'none';
+                    returnDateInput.removeAttribute("required");
                 </script>
             </div>
         </div>

@@ -8,39 +8,75 @@
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
-            margin: 20px;
+            margin: 0;
             padding: 0;
             background-image: url("{{ url_for('static', filename='homepage/images/Background.jpg') }}");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         h1 {
             color: #333;
+            text-align: center;
+            margin-top: 20px;
         }
         .details-section {
-            background-color: rgba(255, 255, 255, 0.75); /* Slightly transparent for readability */
-            border: 1px solid #ddd;
-            padding: 20px;
-            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            background-color: rgba(255, 255, 255, 0.8); 
             border-radius: 8px;
+            padding: 20px;
+            width: 80%; 
+            max-width: 100%;
+            margin-top: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .detail-item {
-            margin: 10px 0;
+        .trip-details, .price-summary {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            width: 48%;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .trip-details h2, .price-summary h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .time-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .price-summary p {
+            margin: 5px 0;
+        }
+        .price-total {
+            font-weight: bold;
+            font-size: 24px;
+            color: #333;
         }
         .button-container {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            width: 80%; 
+            max-width: 100%;
+            margin-top: 20px;
         }
         .button {
-            padding: 10px 15px;
+            padding: 10px 20px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             text-decoration: none;
             color: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         }
         .back-button {
             background-color: #4CAF50;
@@ -58,26 +94,43 @@
 </head>
 <body>
 
-    <h1>Flight Details</h1>
+    <h1>Trip Review</h1>
 
     <div class="details-section">
-        {% if flight %}
-            <div class="detail-item"><strong>Flight Number:</strong> {{ flight.flight_number }}</div>
-            <div class="detail-item"><strong>Departure:</strong> {{ flight.departure }}</div>
-            <div class="detail-item"><strong>Destination:</strong> {{ flight.destination }}</div>
-            <div class="detail-item"><strong>Departure Time:</strong> {{ flight.departure_time }}</div>
-            <div class="detail-item"><strong>Arrival Time:</strong> {{ flight.arrival_time }}</div>
-            <div class="detail-item"><strong>Price:</strong> {{ price }}</div>
-        {% else %}
-            <p>No details available for this flight.</p>
-        {% endif %}
+
+        <div class="trip-details">
+            <h2>Departing flight<h2>
+            <p>{{ flight.departure }} → {{ flight.destination }}</p>
+            <p>{{ flight.date }}</p>
+            <div class="time-info">
+                <div>
+                    <strong>{{ flight.departure_time }}</strong> <br>
+                    {{ flight.origin }}
+                </div>
+                <div>
+                    <p><small>{{ flight.duration }}</small></p>
+                </div>
+                <div class="time-line"></div>
+                <div>
+                    <strong>{{ flight.arrival_time }}</strong> <br>
+                    {{ flight.dest }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Summary Section -->
+        <div class="price-summary">
+            <h2>Price summary</h2>
+            <p>Air transportation charges: <span>${{price}}</span></p>
+            <p>Taxes, fees, and charges: <span>${{ (price*0.19) | round(2)}}</span></p>
+            <hr>
+            <p class="price-total">Grand total: <span>${{ (price * 1.19) | round(2) }}</span></p>
+        </div>
     </div>
 
+    <!-- Buttons -->
     <div class="button-container">
-        <!-- Back button goes back to the previous page -->
         <button onclick="history.back()" class="button back-button">Back</button>
-
-        <!-- Pay button to go to the passenger information form -->
         <form action="{{ url_for('passenger_info') }}" method="get" style="display: inline;">
             <button type="submit" class="button pay-button">Continue</button>
         </form>
