@@ -3,6 +3,7 @@ from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+import time
 
 load_dotenv(dotenv_path="key.env")
 
@@ -280,16 +281,22 @@ def passenger_info():
     except Exception as e:
         return f"An error occurred while fetching data: {str(e)}", 500
 
+
 @app.route('/process_payment', methods=['POST'])
 def process_payment():
-    # Retrieve necessary data from the session
+    return render_template('loading.html'), 200
+    
+@app.route('/finalize_payment')
+def finalize_payment():
+
+    time.sleep(3)
+
     flight_info = session.get('flight_info')
-    passenger_info = session.get('passenger_data')  # Assumes passenger_data includes first/last names
+    passenger_info = session.get('passenger_data')
     
     if not flight_info or not passenger_info:
         return "Missing booking data", 400
 
-    # Prepare data for insertion
     booking_data = {
         "username": session.get('current_username'),
         "flightnumber": flight_info.get('flight_number'),
@@ -298,13 +305,8 @@ def process_payment():
         "last_name": passenger_info.get('lastname'),
     }
 
-    print(booking_data)
-
-    # Insert data into Supabase `bookinghistory` table
     supabase.table("bookinghistory").insert(booking_data).execute()
 
-
-    # Redirect to the paymentsuccess page
     return redirect(url_for('paymentsuccess'))
 
 @app.route('/paymentsuccess')
