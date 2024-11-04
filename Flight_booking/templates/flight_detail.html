@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 0;
+            background-image: url("{{ url_for('static', filename='homepage/images/Background.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
+        }
+        h1 {
+            color: #333;
+        }
+        .details-section {
+            background-color: rgba(255, 255, 255, 0.75); /* Slightly transparent for readability */
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .detail-item {
+            margin: 10px 0;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+        }
+        .button {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+        .back-button {
+            background-color: #4CAF50;
+        }
+        .back-button:hover {
+            background-color: #45a049;
+        }
+        .pay-button {
+            background-color: #FF5722;
+        }
+        .pay-button:hover {
+            background-color: #E64A19;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Flight Details</h1>
+
+    <div class="details-section">
+        {% if flight %}
+            <div class="detail-item"><strong>Flight Number:</strong> {{ flight.flight_number }}</div>
+            <div class="detail-item"><strong>Departure:</strong> {{ flight.departure }}</div>
+            <div class="detail-item"><strong>Destination:</strong> {{ flight.destination }}</div>
+            <div class="detail-item"><strong>Departure Time:</strong> {{ flight.departure_time }}</div>
+            <div class="detail-item"><strong>Arrival Time:</strong> {{ flight.arrival_time }}</div>
+            <div class="detail-item"><strong>Price:</strong> {{ price }}</div>
+        {% else %}
+            <p>No details available for this flight.</p>
+        {% endif %}
+    </div>
+
+    <div class="button-container">
+        <!-- Back button goes back to the previous page -->
+        <button onclick="history.back()" class="button back-button">Back</button>
+
+        <!-- Pay button to go to the passenger information form -->
+        <form action="{{ url_for('passenger_info') }}" method="get" style="display: inline;">
+            <button type="submit" class="button pay-button">Continue</button>
+        </form>
+    </div>
+
+</body>
+</html>

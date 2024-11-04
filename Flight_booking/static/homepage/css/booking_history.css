@@ -1,0 +1,93 @@
+/* 设置背景图片覆盖整个页面 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url("/static/homepage/images/background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.background-overlay {
+    background-color: rgba(0, 0, 0, 0.3); /* 添加半透明遮罩 */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.booking-history {
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.9); /* 设置白色背景并半透明 */
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.booking-card {
+    background: transparent; /* 保持背景透明 */
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.flight-info {
+    padding: 20px;
+}
+
+.flight-info h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.airline {
+    color: orange;
+    font-size: 16px;
+}
+
+.booking-date {
+    font-size: 14px;
+    color: #666;
+}
+
+.flight-details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.departure, .duration, .arrival {
+    text-align: center;
+}
+
+.baggage-info {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.select-seat {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.select-seat:hover {
+    background-color: #0056b3;
+}
