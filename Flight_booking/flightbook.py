@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv(dotenv_path="key.env")
 
@@ -9,9 +10,10 @@ supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_KEY")
 
 
+
 app = Flask(__name__, static_folder='static')
 
-# supabase: Client = create_client(supabase_url, supabase_key)
+supabase: Client = create_client(supabase_url, supabase_key)
 
 # # test database can work or not
 # response = supabase.table("user_account").select("*").execute()
@@ -178,53 +180,93 @@ passengers_data_store = []
 @app.route('/')
 def home():
     return redirect(url_for('passenger_info'))
+    
+
 
 @app.route('/passenger_info', methods=['GET', 'POST'])
 def passenger_info():
+
+
+    current_username = session.get('current_username')
+    if not current_username:
+        return "User not authenticated", 401 
+    
     if request.method == 'POST':
         # Check if all required fields are provided
         required_fields = ['first_name_1', 'last_name_1', 'email_1', 'phone_1', 'dob_1', 'address1_1', 'country_1', 'city_1', 'postal_code_1']
         for field in required_fields:
             if not request.form.get(field):
-                return "Missing required field", 400  # 返回错误信息
+                return "Missing required field", 400  # return erro info
+            
+        try:
+            birthday = datetime.strptime(request.form['dob_1'], "%Y-%m-%d").strftime("%Y-%m-%d")
+        except ValueError:
+            return "Invalid date format for birthday", 400
         
         # Store passenger data in a dictionary
+        birthday = datetime.strptime(request.form['dob_1'], "%Y-%m-%d").strftime("%Y-%m-%d")
         passenger_data = {
-            'number_of_passengers': request.form['passengers'],
-            'first_name_1': request.form['first_name_1'],
-            'last_name_1': request.form['last_name_1'],
-            'middle_name_1': request.form.get('middle_name_1', ''),
-            'id_number_1': request.form.get('id_number_1', ''),
-            'email_1': request.form['email_1'],
-            'phone_1': request.form['phone_1'],
-            'dob_1': request.form['dob_1'],
-            'address1_1': request.form['address1_1'],
-            'address2_1': request.form.get('address2_1', ''),
-            'country_1': request.form['country_1'],
-            'city_1': request.form['city_1'],
-            'postal_code_1': request.form['postal_code_1'],
-            'em_first_name': request.form['em_first_name'],
-            'em_last_name': request.form['em_last_name'],
-            'em_phone': request.form['em_phone'],
-            'em_email': request.form['em_email'],
-            'bags': request.form['bags']
+            'username' : current_username,
+            'firstname': request.form['first_name_1'],
+            'lastname': request.form['last_name_1'],
+            'idnumber': request.form.get('id_number_1', ''),
+            'emailaddress': request.form['email_1'],
+            'phone': request.form['phone_1'],
+            'birthday': birthday,
+            'addressline1': request.form['address1_1'],
+            'addressline2': request.form.get('address2_1', ''),
+            'country': request.form['country_1'],
+            'city': request.form['city_1'],
+            'postalcode': request.form['postal_code_1'],
+            'emergfirstname': request.form['em_first_name'],
+            'emerglastname': request.form['em_last_name'],
+            'emergphone': request.form['em_phone'],
+            'emergemailaddress': request.form['em_email'],
         }
+        
+                # insert passenger info into supabase
+        try:
+            response = supabase.table("passenger_information").upsert(passenger_data, on_conflict=["username"]).execute()
+            if response.error:
+                return f"Error adding passenger data: {response.error}", 500
+            else:
+                # Fetch the updated data from the database to display it
+                updated_response = supabase.table("passenger_information").select("*").eq("username", current_username).execute()
+                if updated_response.data:
+                    # Pass the updated data to the template
+                    updated_data = updated_response.data[0]
+                    return render_template('booking.html', existing_data=updated_data)
+                else:
+                    return "Error retrieving updated data", 500
+        except Exception as e:
+            return f"Data submitted successfully!", 500
 
-        # Append the passenger data to the list
-        passengers_data_store.append(passenger_data)
+    # if GET request，return passenger info page
+    try:
+        response = supabase.table("passenger_information").select("*").eq("username", current_username).execute()
+        if response.data:
+            # If data exists, pass it to the template
+            existing_data = response.data[0]  # Get the first matching row
+            return render_template('booking.html', existing_data=existing_data)
+        else:
+            # If no existing data, render an empty form
+            return render_template('booking.html', existing_data=None)
+    except Exception as e:
+        return f"An error occurred while fetching data: {str(e)}", 500
 
-        # Print passenger data
-        print("Stored Passenger Data:")
-        for passenger in passengers_data_store:
-            print(passenger)
-        return "Passenger information submitted!"
-    
-    return render_template('booking.html')
+
 
 @app.route('/view_passenger_data')
 def view_passenger_data():
-    # Return the entire list of stored passenger data
-    return {"passenger_data": passengers_data_store}
+    try:
+        response = supabase.table("passenger_infomation").select("*").execute()
+        if response.get('error'):
+            return f"Error fetching passenger data: {response['error']}", 500
+        else:
+            return {"passenger_data": response['data']}
+    except Exception as e:
+        return f"An error occurred while trying to fetch data from Supabase: {str(e)}", 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
