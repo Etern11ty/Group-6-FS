@@ -1,5 +1,4 @@
 <style>
-    /* 通用样式 */
     body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -10,7 +9,6 @@
         background-attachment: fixed;
     }
 
-    /* 顶部导航栏 */
     .top-nav {
         display: flex;
         justify-content: space-between;
@@ -29,10 +27,9 @@
         text-decoration: none;
     }
 
-    /* 固定菜单样式 */
     .image-menu {
         position: fixed;
-        top: 60px; /* 使其在导航栏下方 */
+        top: 60px; 
         left: 10px;
         background-color: rgba(255, 255, 255, 0.9);
         padding: 10px;
@@ -52,14 +49,13 @@
         margin: 10px 0;
     }
 
-    /* 欢迎页面主要内容 */
     .welcome-section {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         min-height: 100vh;
-        padding-top: 100px; /* 确保顶部导航和菜单不重叠 */
+        padding-top: 100px; 
         padding-bottom: 20px;
     }
 
@@ -105,7 +101,6 @@
         height: 50px;
     }
 
-    /* 手机端样式 */
     @media (max-width: 768px) {
         .top-nav {
             flex-direction: column;
@@ -118,7 +113,7 @@
         }
 
         .image-menu {
-            display: none; /* 移动端隐藏固定菜单 */
+            display: none; 
         }
 
         .welcome-section {
@@ -134,31 +129,39 @@
             flex-direction: column;
         }
 
+        .form-group {
+            width: 100%; 
+
+        input[type="text"], input[type="date"], select {
+            width: 100%; 
+        }
+
+
         .search-button img {
-            width: 40px;
+            width: 70px;
             height: 40px;
         }
     }
 </style>
 
 <body>
-    <!-- 顶部导航栏 -->
+
     <div class="top-nav">
         <a href="{{ url_for('login_page') }}" style="display: none;" id="login-link">{{ current_username }}</a>
         <a href="{{ url_for('passenger_info') }}">Passenger Information</a>
         <a href="{{ url_for('booking_history') }}">Booking History</a>
     </div>
 
-    <!-- 主页面内容 -->
+
     <section class="welcome-section" style="background-image: url('{{ url_for('static', filename='homepage/images/Background.jpg') }}');">
         <div class="overlay">
             <img src="{{ url_for('static', filename='homepage/images/Welcome to G6 flights.png') }}" alt="Welcome" class="welcome-image">
             <div class="booking-form">
                 <h2 class="form-title">Booking Process</h2>
 
-                <!-- 预订表单 -->
+
                 <form method="POST" action="/search-results">
-                    <!-- 出行类型选择 -->
+
                     <div class="form-row radio-row">
                         <label>
                             <input type="radio" name="trip" value="oneway" checked> Oneway
@@ -168,7 +171,6 @@
                         </label>
                     </div>
 
-                    <!-- 表单输入字段 -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>From:</label>
@@ -248,7 +250,7 @@
         document.getElementById('returnDateGroup').style.display = 'none';
         returnDateInput.removeAttribute("required");
 
-        // 隐藏移动端的登录和其他不需要的菜单
+
         if (window.innerWidth <= 768) {
             document.getElementById('login-link').style.display = 'none';
         }
