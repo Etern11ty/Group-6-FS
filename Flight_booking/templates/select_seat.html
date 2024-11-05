@@ -6,37 +6,84 @@
     <title>Select a Seat</title>
     <link rel="stylesheet" href="/static/selectseatsstyle.css">
     <style>
-        .seat-container {
-            margin: 20px;
+        /* 整个页面居中对齐 */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
+
+        /* 标题居中 */
+        h2 {
+            text-align: center;
+        }
+
+        /* 座位容器居中对齐 */
+        .seat-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 每一排居中对齐 */
         .row {
             display: flex;
             align-items: center;
+            justify-content: center;
             margin-bottom: 10px;
         }
-        .row-label {
-            margin-right: 10px;
-            font-weight: bold;
-        }
+
+        /* 座位按钮 */
         .seat {
-            width: 40px;
-            height: 40px;
-            margin-right: 5px;
+            width: 50px;
+            height: 50px;
+            margin: 5px;
             text-align: center;
             cursor: pointer;
+            border-radius: 8px;  /* 增加圆角 */
+            font-weight: bold;   /* 增加字体粗度 */
+            border: 2px solid #000; /* 增加边框 */
         }
+
+        /* 不可用座位样式 */
         .occupied {
             background-color: red;
             cursor: not-allowed;
+            color: #fff;
         }
+
+        /* 可用座位样式 */
         .available {
             background-color: lightgreen;
         }
+
+        /* 选中的座位样式 */
         .selected {
             background-color: yellow;
         }
+
+        /* 确认按钮样式 */
         .confirm-button {
             margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background-color: #4CAF50;  /* 绿色背景 */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        /* 鼠标悬停时确认按钮的样式 */
+        .confirm-button:hover {
+            background-color: #45a049; /* 变深的绿色 */
         }
     </style>
 </head>
@@ -61,10 +108,12 @@
         {% endfor %}
     </div>
     
-
+    <!-- 确认按钮居中 -->
     <form method="POST" action="/confirm_seat/{{ flight_id }}">
         <input type="hidden" id="selected_seat" name="seat">
-        <button type="submit" class="confirm-button">Confirm Seat</button>
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <button type="submit" class="confirm-button">Confirm Seat</button>
+        </div>
     </form>
 
     <script>
@@ -88,8 +137,6 @@
 
             // 将选中的座位号存到表单中
             document.getElementById('selected_seat').value = seatId;
-
-         
         }
     </script>
 </body>
