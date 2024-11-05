@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Processing Payment</title>
     <style>
-        /* 中心居中的加载动画样式 */
+        /* Centered loading animation styles */
         .loading-container {
             display: flex;
             align-items: center;
@@ -37,10 +37,10 @@
         <span>Processing your payment...</span>
     </div>
 
-    
     <script>
         setTimeout(function() {
             window.location.href = "{{ url_for('finalize_payment') }}";
-        }, 1000);  
+        }, 1000);  // 3 seconds delay before redirecting
+    </script>
 </body>
 </html>
