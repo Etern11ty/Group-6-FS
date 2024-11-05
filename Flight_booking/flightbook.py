@@ -303,6 +303,16 @@ def finalize_payment():
         "purchase_time": 'now()',
         "first_name": passenger_info.get('firstname'),
         "last_name": passenger_info.get('lastname'),
+
+        "origin": flight_info.get('departure'),
+        "dest": flight_info.get('destination'),
+        "origin_code": flight_info.get('origin'),
+        "dest_code": flight_info.get('dest'),
+        "date": flight_info.get('date'),
+        "dept_time": flight_info.get('departure_time'),
+        "arrive_time": flight_info.get('arrival_time'),
+
+
     }
 
     supabase.table("bookinghistory").insert(booking_data).execute()
