@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1000px;
+            width: 100%;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .payment-form, .info-section {
+            width: 50%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .detail-item {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .payment-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .payment-form input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .total-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+        .extra-fees {
+            font-size: 14px;
+            color: #666;
+        }
+        .pay-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .pay-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Payment</h1>
+
+<div class="container">
+    <!-- Payment Form Section (位置1) -->
+    <div class="payment-form">
+        <h2>Payment Details</h2>
+        <p class="total-amount">Total: ${{ (flight['price'] * 1.19) | round(2) }}</p>
+        <form action="{{ url_for('process_payment') }}" method="post">
+            <label for="card-type">Payment Method</label>
+            <input type="radio" name="payment_type" value="credit" checked> Credit Card
+            <input type="radio" name="payment_type" value="debit"> Debit Card
+            <label for="card-number">Card Number</label>
+            <input type="text" id="card-number" name="card_number" placeholder="1234 5678 9123 4567" required>
+            <label for="cardholder-name">Cardholder Name</label>
+            <input type="text" id="cardholder-name" name="cardholder_name" placeholder="John K" required>
+            <label for="expiry-date">Expiry Date</label>
+            <input type="text" id="expiry-date" name="expiry_date" placeholder="MM/YY" required>
+            <label for="cvv">CVV</label>
+            <input type="text" id="cvv" name="cvv" placeholder="123" required>
+            <button type="submit" class="pay-button">Pay Now</button>
+        </form>
+    </div>
+
+    <!-- Flight and Passenger Info Section (位置2) -->
+    <div class="info-section">
+        <h2>Flight and Passenger Information</h2>
+        <div class="detail-item"><strong>From:</strong> {{ flight['departure'] }} ({{ flight['origin'] }})</div>
+        <div class="detail-item"><strong>To:</strong> {{ flight['destination'] }} ({{ flight['dest'] }})</div>
+        <div class="detail-item"><strong>Date:</strong> {{ flight['date'] }}</div>
+        <div class="detail-item"><strong>Departure Time:</strong> {{ flight['departure_time'] }}</div>
+        <div class="detail-item"><strong>Arrival Time:</strong> {{ flight['arrival_time'] }}</div>
+        <div class="detail-item"><strong>Passenger:</strong> {{ passenger.firstname }}  {{ passenger.lastname }}</div>
+        <hr>
+        <div class="detail-item"><strong>Air transportation charges:</strong> ${{ flight['price'] }}</div>
+        <div class="detail-item extra-fees">Taxes, fees, and charges: ${{ (flight['price'] * 0.19) | round(2) }}</div>
+        <p class="total-amount">Grand total: ${{ (flight['price'] * 1.19) | round(2) }}</p>
+    </div>
+</div>
+
+</body>
+</html>
