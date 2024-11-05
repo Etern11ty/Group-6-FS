@@ -51,7 +51,19 @@ def flights():
 
 @app.route('/booking-history')
 def booking_history():
-    return render_template('booking_history.html')
+    username = session.get('current_username')
+    if not username:
+        return "User not authenticated", 401
+    
+    # Fetch booking history for the current user
+    response = supabase.table("bookinghistory").select("*").eq("username", username).execute()
+    
+    if response.data:
+        bookings = response.data  # User's booking history
+    else:
+        bookings = []
+    now = datetime.now()
+    return render_template('booking_history.html', bookings=bookings, now=now)
 
 
 @app.route('/login_page')
@@ -303,7 +315,6 @@ def finalize_payment():
         "purchase_time": 'now()',
         "first_name": passenger_info.get('firstname'),
         "last_name": passenger_info.get('lastname'),
-
         "origin": flight_info.get('departure'),
         "dest": flight_info.get('destination'),
         "origin_code": flight_info.get('origin'),
@@ -311,7 +322,6 @@ def finalize_payment():
         "date": flight_info.get('date'),
         "dept_time": flight_info.get('departure_time'),
         "arrive_time": flight_info.get('arrival_time'),
-
 
     }
 
@@ -333,7 +343,11 @@ def paymentsuccess():
 
     return render_template('paymentsuccess.html', flight_info=flight_info, passenger_info=passenger_info)
 
-
+@app.route('/select_seat', methods=['GET'])
+def select_seat():
+    flight_number = request.args.get('flight_number')
+    # 这里可以添加逻辑，例如展示选择座位的页面
+    return render_template('select_seat.html', flight_number=flight_number)
 
 @app.route('/view_booking_history')
 def view_booking_history():

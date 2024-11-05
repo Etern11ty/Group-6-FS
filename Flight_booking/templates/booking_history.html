@@ -4,42 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking History</title>
-    <!-- 引用CSS文件 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='homepage/css/booking_history.css') }}">
+    <style>
+        .booking-history {
+            max-width: 800px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        .booking-card {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .flight-details {
+            flex: 1;
+            font-size: 16px;
+        }
+
+        .flight-info h2 {
+            font-size: 20px;
+            color: #333;
+            margin: 0;
+        }
+
+        .airline {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-section p {
+            margin: 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .select-seat {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            align-self: flex-start;
+        }
+
+        .select-seat:hover {
+            background-color: #45a049;
+        }
+
+        .back-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #B9D8E4;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background-color: #A5C5D1;
+        }
+    </style>
 </head>
 <body>
-    <div class="background-overlay">
-        <div class="booking-history">
-            <h1>Booking History</h1>
+    <div class="booking-history">
+        <h1>Booking History</h1>
+        {% for booking in bookings %}
             <div class="booking-card">
-                <div class="flight-info">
-                    <h2>Shanghai → Toronto</h2>
-                    <span class="airline">Spice jet Airline</span>
-                    <p class="booking-date">Booking date: Fri May 10</p>
-                    <div class="flight-details">
-                        <div class="departure">
-                            <h3>Shanghai 11:45 AM</h3>
-                            <p>Fri 27 Sep 2024</p>
-                            <p>PVG</p>
-                        </div>
-                        <div class="duration">
-                            <h3>Time</h3>
-                            <p>14h 40m</p>
-                        </div>
-                        <div class="arrival">
-                            <h3>Toronto 2:25 PM</h3>
-                            <p>Fri 27 Sep 2024</p>
-                            <p>YYZ</p>
-                        </div>
-                    </div>
-                    <div class="baggage-info">
+                <div class="flight-details">
+                    <h2>{{ booking.origin }} → {{ booking.dest }}</h2>
+                    <div class="info-section">
+                        <p class="airline">Flight Number: {{ booking.flightnumber }}</p>
+                        <p>Booking date: {{ booking.purchase_time }}</p>
+                        <p>Departure: {{ booking.dept_time }}</p>
+                        <p>Arrival: {{ booking.arrive_time }}</p>
+                        <p>First Name: {{ booking.first_name }}</p>
+                        <p>Last Name: {{ booking.last_name }}</p>
                         <p>Check-in Baggage: 23kg/person</p>
                         <p>Carry-on Baggage: 7kg/person</p>
                     </div>
-                    <button class="select-seat">Select Seat Now</button>
                 </div>
+                <!-- Go to Select Seat Button -->
+                <form action="{{ url_for('select_seat', flight_number=booking.flightnumber) }}" method="get">
+                    <button type="submit" class="select-seat">Go to Select Seat</button>
+                </form>
             </div>
-        </div>
+        {% endfor %}
+        <form action="{{ url_for('index') }}" method="get">
+            <button type="submit" class="back-button">Back to Homepage</button>
+        </form>
     </div>
 </body>
 </html>
