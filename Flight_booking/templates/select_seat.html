@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select a Seat</title>
+    <link rel="stylesheet" href="/static/selectseatsstyle.css">
+    <style>
+        .seat-container {
+            margin: 20px;
+        }
+        .row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .row-label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .seat {
+            width: 40px;
+            height: 40px;
+            margin-right: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .occupied {
+            background-color: red;
+            cursor: not-allowed;
+        }
+        .available {
+            background-color: lightgreen;
+        }
+        .selected {
+            background-color: yellow;
+        }
+        .confirm-button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Select a Seat for Flight ID: {{ flight_id }}</h2>
+
+    <div class="seat-container">
+        {% for row in range(1, 31) %}  <!-- 假设有 30 排 -->
+            <div class="row">
+                <span class="row-label">Row {{ row }}</span>
+                {% for seat_letter in ['A', 'B', 'C', 'D', 'E', 'F'] %}
+                    {% set seat_id = row|string + seat_letter %}
+                    {% set seat_data = seats | selectattr('seat_number', 'equalto', seat_id) | list %}
+    
+                    {% if seat_data and seat_data[0].status == 'booked' %}
+                        <button class="seat occupied" id="seat-{{ seat_id }}" type="button" disabled>{{ seat_id }}</button>
+                    {% else %}
+                        <button class="seat available" id="seat-{{ seat_id }}" type="button" onclick="selectSeat('{{ seat_id }}')">{{ seat_id }}</button>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+    
+
+    <form method="POST" action="/confirm_seat/{{ flight_id }}">
+        <input type="hidden" id="selected_seat" name="seat">
+        <button type="submit" class="confirm-button">Confirm Seat</button>
+    </form>
+
+    <script>
+        let selectedSeat = null;
+
+        function selectSeat(seatId) {
+            // 如果之前选中其他座位，重置它的样式
+            if (selectedSeat) {
+                const previousSeatElement = document.getElementById('seat-' + selectedSeat);
+                if (previousSeatElement) {
+                    previousSeatElement.classList.remove('selected');
+                }
+            }
+
+            // 设置当前选中的座位
+            selectedSeat = seatId;
+            const currentSeatElement = document.getElementById('seat-' + seatId);
+            if (currentSeatElement) {
+                currentSeatElement.classList.add('selected');
+            }
+
+            // 将选中的座位号存到表单中
+            document.getElementById('selected_seat').value = seatId;
+
+         
+        }
+    </script>
+</body>
+</html>
+
+
+

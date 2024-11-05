@@ -11,34 +11,42 @@
     <div class="background-overlay">
         <div class="booking-history">
             <h1>Booking History</h1>
-            <div class="booking-card">
-                <div class="flight-info">
-                    <h2>Shanghai → Toronto</h2>
-                    <span class="airline">Spice jet Airline</span>
-                    <p class="booking-date">Booking date: Fri May 10</p>
-                    <div class="flight-details">
-                        <div class="departure">
-                            <h3>Shanghai 11:45 AM</h3>
-                            <p>Fri 27 Sep 2024</p>
-                            <p>PVG</p>
-                        </div>
-                        <div class="duration">
-                            <h3>Time</h3>
-                            <p>14h 40m</p>
-                        </div>
-                        <div class="arrival">
-                            <h3>Toronto 2:25 PM</h3>
-                            <p>Fri 27 Sep 2024</p>
-                            <p>YYZ</p>
+
+            {% if seats %}
+                {% for seat in seats %}
+                    <div class="booking-card">
+                        <div class="flight-info">
+                            <h2>Flight ID: {{ seat.flight_id }}</h2>
+                            <span class="airline">Spice Jet Airline</span>
+                            <p class="booking-date">Booking date: Fri May 10</p>
+                            <div class="flight-details">
+                                <div class="departure">
+                                    <h3>Shanghai 11:45 AM</h3>
+                                    <p>Fri 27 Sep 2024</p>
+                                    <p>PVG</p>
+                                </div>
+                                <div class="duration">
+                                    <h3>Time</h3>
+                                    <p>14h 40m</p>
+                                </div>
+                                <div class="arrival">
+                                    <h3>Toronto 2:25 PM</h3>
+                                    <p>Fri 27 Sep 2024</p>
+                                    <p>YYZ</p>
+                                </div>
+                            </div>
+                            <div class="baggage-info">
+                                <p>Check-in Baggage: 23kg/person</p>
+                                <p>Carry-on Baggage: 7kg/person</p>
+                            </div>
+                            <a href="{{ url_for('select_seat', flight_id=seat.flight_id) }}">Select Seat</a>
                         </div>
                     </div>
-                    <div class="baggage-info">
-                        <p>Check-in Baggage: 23kg/person</p>
-                        <p>Carry-on Baggage: 7kg/person</p>
-                    </div>
-                    <button class="select-seat">Select Seat Now</button>
-                </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                <p>No bookings found.</p>
+            {% endif %}
+            
         </div>
     </div>
 </body>
