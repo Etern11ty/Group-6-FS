@@ -6,24 +6,146 @@
     <title>G6 Flights</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='homepage/css/styles.css') }}">
     <style>
-        .image-menu {
-            width: 200px; 
-            height: auto; 
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url("{{ url_for('static', filename='homepage/images/Background.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
+    
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+        }
+    
+        .top-nav a {
+            margin: 0 10px;
+            color: #333;
+            text-decoration: none;
+        }
+    
+        /* 固定菜单样式 */
+        .image-menu {
+            position: fixed;
+            top: 60px; 
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            width: 150px;
+        }
+    
         .image-menu ul {
             list-style-type: none;
             padding: 0;
+            margin: 0;
         }
+    
         .image-menu li {
             margin: 10px 0;
         }
-        .top-nav {
+
+        .welcome-section {
             display: flex;
-            justify-content: flex-end;
+            flex-direction: column;
             align-items: center;
-            padding: 10px;
+            justify-content: center;
+            min-height: 100vh;
+            padding-top: 100px; 
+            padding-bottom: 20px;
+        }
+    
+        .overlay {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+    
+        .welcome-image {
+            width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+        }
+    
+        .booking-form {
+            width: 100%;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    
+        .form-group {
+            flex: 1;
+            min-width: 100px;
+        }
+    
+        .search-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+    
+        .search-button img {
+            width: 50px;
+            height: 50px;
+        }
+    
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                padding: 10px;
+            }
+    
+            .top-nav a {
+                margin: 5px 0;
+                font-size: 14px;
+            }
+    
+            .image-menu {
+                position: absolute;
+                top: 70px;
+                width: 90%;
+                left: 5%;
+            }
+    
+            .welcome-section {
+                padding-top: 150px;
+            }
+    
+            .overlay {
+                width: 95%;
+                padding: 15px;
+            }
+    
+            .form-row {
+                flex-direction: column;
+            }
+    
+            .search-button img {
+                width: 40px;
+                height: 40px;
+            }
         }
     </style>
+    
 </head>
 <body>
 
