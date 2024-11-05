@@ -343,10 +343,6 @@ def paymentsuccess():
 
     return render_template('paymentsuccess.html', flight_info=flight_info, passenger_info=passenger_info)
 
-# @app.route('/select_seat', methods=['GET'])
-# def select_seat():
-#     flight_number = request.args.get('flight_number')
-#     return render_template('select_seat.html', flight_number=flight_number)
 
 @app.route('/view_booking_history')
 def view_booking_history():
@@ -429,7 +425,6 @@ def confirm_seat(flight_id):
         if selected_seat in seat_numbers:
             return "Seat is already booked. Please choose another seat.", 400
 
-
         try:
             response = supabase.table("seats").update({
                 "status": "occupied",
@@ -455,4 +450,4 @@ def seat_confirmation(flight_id, seat):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080)) 
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=True)
