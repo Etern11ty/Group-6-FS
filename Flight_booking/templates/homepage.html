@@ -6,6 +6,7 @@
     <title>G6 Flights</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='homepage/css/styles.css') }}">
     <style>
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -15,10 +16,10 @@
             background-position: center;
             background-attachment: fixed;
         }
-    
+
         .top-nav {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             padding: 10px 20px;
             background-color: rgba(255, 255, 255, 0.8);
@@ -27,17 +28,17 @@
             width: 100%;
             z-index: 10;
         }
-    
+
         .top-nav a {
             margin: 0 10px;
             color: #333;
             text-decoration: none;
         }
-    
+
         /* 固定菜单样式 */
         .image-menu {
             position: fixed;
-            top: 60px; 
+            top: 60px;
             left: 10px;
             background-color: rgba(255, 255, 255, 0.9);
             padding: 10px;
@@ -46,16 +47,17 @@
             z-index: 10;
             width: 150px;
         }
-    
+
         .image-menu ul {
             list-style-type: none;
             padding: 0;
             margin: 0;
         }
-    
+
         .image-menu li {
             margin: 10px 0;
         }
+
 
         .welcome-section {
             display: flex;
@@ -63,10 +65,10 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding-top: 100px; 
+            padding-top: 100px;
             padding-bottom: 20px;
         }
-    
+
         .overlay {
             background-color: rgba(255, 255, 255, 0.9);
             padding: 20px;
@@ -75,13 +77,13 @@
             max-width: 500px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
-    
+
         .welcome-image {
             width: 100%;
             height: auto;
             margin-bottom: 15px;
         }
-    
+
         .booking-form {
             width: 100%;
         }
@@ -91,78 +93,61 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-    
+
         .form-group {
             flex: 1;
             min-width: 100px;
         }
-    
+
         .search-group {
             display: flex;
             justify-content: center;
             margin-top: 10px;
         }
-    
+
         .search-button img {
             width: 50px;
             height: 50px;
         }
-    
+
         @media (max-width: 768px) {
-            .top-nav {
-                flex-direction: column;
-                padding: 10px;
-            }
-    
             .top-nav a {
-                margin: 5px 0;
                 font-size: 14px;
             }
-    
-            .image-menu {
-                position: absolute;
-                top: 70px;
-                width: 90%;
-                left: 5%;
+
+            /* 移除Booking History和Logout */
+            .image-menu ul li:nth-child(1), /* Booking History */
+            .image-menu ul li:nth-child(2)  /* Logout */ {
+                display: none;
             }
-    
-            .welcome-section {
-                padding-top: 150px;
-            }
-    
-            .overlay {
-                width: 95%;
-                padding: 15px;
-            }
-    
-            .form-row {
+
+            /* 把Booking History移到Passenger Information下方 */
+            .image-menu ul {
+                display: flex;
                 flex-direction: column;
             }
-    
-            .search-button img {
-                width: 40px;
-                height: 40px;
+
+            .image-menu ul li {
+                margin: 10px 0;
             }
         }
     </style>
-    
 </head>
 <body>
 
     <!-- Top navigation bar -->
     <div class="top-nav">
         <a href="{{ url_for('login_page') }}">{{ current_username }}</a>
-        <a href="{{ url_for('passenger_info') }}">passenger information</a>
+        <a href="{{ url_for('passenger_info') }}">Passenger Information</a>
     </div>
 
-    <!-- Fixed Menu with Background Image -->
-    <div id="imageMenu" class="image-menu" style="width: {{ '150px' if current_username != 'Login / Sign up' else '200px' }} ; ">
+    <!-- Fixed Menu without Booking History and Logout on mobile -->
+    <div id="imageMenu" class="image-menu">
         <ul>
-            <li><a href="{{ url_for('booking_history') }}">Booking History</a></li>
-            {% if current_username == "Login / Sign up" %}
-            <li><a href="{{ url_for('login_page') }}">Login</a></li>
+            <li><a href="{{ url_for('passenger_info') }}">Passenger Information</a></li>
+            {% if current_username != "Login / Sign up" %}
+                <li><a href="{{ url_for('booking_history') }}">Booking History</a></li>
             {% endif %}
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
     </div>
 
@@ -171,7 +156,7 @@
         <div class="overlay">
             <img src="{{ url_for('static', filename='homepage/images/Welcome to G6 flights.png') }}" alt="Welcome" class="welcome-image">
             <div class="booking-form">
-                <h2 class="form-title">Booking process</h2>
+                <h2 class="form-title">Booking Process</h2>
 
                 <!-- Trip Type Selection -->
                 <form method="POST" action="/search-results">
