@@ -343,11 +343,10 @@ def paymentsuccess():
 
     return render_template('paymentsuccess.html', flight_info=flight_info, passenger_info=passenger_info)
 
-@app.route('/select_seat', methods=['GET'])
-def select_seat():
-    flight_number = request.args.get('flight_number')
-    # 这里可以添加逻辑，例如展示选择座位的页面
-    return render_template('select_seat.html', flight_number=flight_number)
+# @app.route('/select_seat', methods=['GET'])
+# def select_seat():
+#     flight_number = request.args.get('flight_number')
+#     return render_template('select_seat.html', flight_number=flight_number)
 
 @app.route('/view_booking_history')
 def view_booking_history():
