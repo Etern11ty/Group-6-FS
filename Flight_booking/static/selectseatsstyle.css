@@ -5,7 +5,7 @@ body {
 }
 
 .background-image-container {
-    background-image: url('/static/your-background-image.jpg');  /* 替换为你喜欢的背景图 URL */
+    background-image: url("{{ url_for('static', filename='register/images/background.jpg') }}");;
     background-size: cover;
     background-position: center;
     height: 100vh;
@@ -15,7 +15,7 @@ body {
 }
 
 .confirmation-container {
-    background: rgba(255, 255, 255, 0.9);  /* 半透明背景 */
+    background: rgba(255, 255, 255, 0.9);  
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);

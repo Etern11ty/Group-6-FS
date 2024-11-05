@@ -369,51 +369,15 @@ def select_seat(flight_id):
     if not current_username:
         return "User not authenticated", 401
 
-    # 检查用户是否已经为该航班选择过座位
     user_seat_response = supabase.table("seats").select("*").eq("flight_id", flight_id).eq("username", current_username).execute()
     
     response = user_seat_response.data[0]
     
     if response['status'] == 'occupied':
-        # 用户已选过座位，重定向到确认页面
+ 
         selected_seat = response['seat_number']
         return redirect(url_for('seat_confirmation', flight_id=flight_id, seat=selected_seat))
 
-
-
-
-    # if request.method == 'POST':
-    #     selected_seat = request.form.get('seat')
-    #     if not selected_seat:
-    #         return "No seat selected", 400
-
-    #     return(selected_seat)
-        # seat_response = supabase.table("seats").select("seat_number").eq("flight_id", flight_id).execute()
-        # seat_occupied = seat_response.data[0]
-        
-        # print(seat_occupied)
-        
-        # if selected_seat in seat_occupied['seat_number']:
-        #     return "Seat is already booked. Please choose another seat.", 400
-        # else:
-        #     return "success"
-# 
-        # try:
-        #     response = supabase.table("seats").update({
-        #         "status": "booked",
-        #         "username": current_username
-        #     }).eq("flight_id", flight_id).eq("seat_number", selected_seat).execute()
-
-        #     if not response or not response.data:
-        #         return "Failed to book seat. Please try again later.", 500
-
-        # except Exception as e:
-        #     return f"An error occurred while booking the seat: {str(e)}", 500
-
-        # # 更新成功后重定向到确认页面
-        # return redirect(url_for('seat_confirmation', flight_id=flight_id, seat=selected_seat))
-
-    # 获取航班的座位数据
     response = supabase.table("seats").select("*").eq("flight_id", flight_id).execute()
     seats = response.data if response.data else []
 
@@ -424,25 +388,24 @@ def select_seat(flight_id):
 
 @app.route('/confirm_seat/<string:flight_id>', methods=['GET', 'POST'])
 def confirm_seat(flight_id):
-    # 获取当前用户的用户名
+
     current_username = session.get('current_username')
     if not current_username:
         return "User not authenticated", 401
 
-    # 如果是 GET 请求，显示座位确认页面
+
     if request.method == 'GET':
-        # 从数据库中获取该航班的座位数据，方便用户选择
+     
         seat_response = supabase.table("seats").select("*").eq("flight_id", flight_id).execute()
         if seat_response.error:
             return f"Error fetching seat data: {seat_response.error}", 500
         
         seats = seat_response.data if seat_response.data else []
-        # 渲染确认座位的模板，传递航班 ID 和座位数据
+  
         return render_template('confirm_seat.html', flight_id=flight_id, seats=seats)
 
-    # 如果是 POST 请求，处理座位确认
     elif request.method == 'POST':
-        # 从表单获取用户选择的座位号
+   
         selected_seat = request.form.get('seat')
 
         if not selected_seat:
@@ -458,8 +421,7 @@ def confirm_seat(flight_id):
         
         if selected_seat in seat_numbers:
             return "Seat is already booked. Please choose another seat.", 400
-        # else:
-        #     return "success"
+
 
         try:
             response = supabase.table("seats").update({
