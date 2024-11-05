@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select a Seat</title>
+    <link rel="stylesheet" href="/static/selectseatsstyle.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-image: url("{{ url_for('static', filename='register/images/background.jpg') }}");
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+        }
+
+ 
+        h2 {
+            text-align: center;
+            color: #fff; 
+        }
+
+
+        .seat-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.8); 
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+
+        .seat {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;  
+            font-weight: bold;   
+            border: 2px solid #000; 
+        }
+
+
+        .occupied {
+            background-color: red;
+            cursor: not-allowed;
+            color: #fff;
+        }
+
+
+        .available {
+            background-color: lightgreen;
+        }
+
+        .selected {
+            background-color: yellow;
+        }
+
+
+        .confirm-button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background-color: #4CAF50;  
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        /* 鼠标悬停时确认按钮的样式 */
+        .confirm-button:hover {
+            background-color: #45a049; 
+        }
+    </style>
+</head>
+<body>
+    <h2>Select a Seat for Flight ID: {{ flight_id }}</h2>
+
+    <div class="seat-container">
+        {% for row in range(1, 31) %}  
+            <div class="row">
+                <span class="row-label">Row {{ row }}</span>
+                {% for seat_letter in ['A', 'B', 'C', 'D', 'E', 'F'] %}
+                    {% set seat_id = row|string + seat_letter %}
+                    {% set seat_data = seats | selectattr('seat_number', 'equalto', seat_id) | list %}
+    
+                    {% if seat_data and seat_data[0].status == 'occupied' %}
+                        <button class="seat occupied" id="seat-{{ seat_id }}" type="button" disabled>{{ seat_id }}</button>
+                    {% else %}
+                        <button class="seat available" id="seat-{{ seat_id }}" type="button" onclick="selectSeat('{{ seat_id }}')">{{ seat_id }}</button>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+    
+
+    <form method="POST" action="/confirm_seat/{{ flight_id }}">
+        <input type="hidden" id="selected_seat" name="seat">
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <button type="submit" class="confirm-button">Confirm Seat</button>
+        </div>
+    </form>
+
+    <script>
+        let selectedSeat = null;
+
+        function selectSeat(seatId) {
+            if (selectedSeat) {
+                const previousSeatElement = document.getElementById('seat-' + selectedSeat);
+                if (previousSeatElement) {
+                    previousSeatElement.classList.remove('selected');
+                }
+            }
+
+            selectedSeat = seatId;
+            const currentSeatElement = document.getElementById('seat-' + seatId);
+            if (currentSeatElement) {
+                currentSeatElement.classList.add('selected');
+            }
+
+            document.getElementById('selected_seat').value = seatId;
+        }
+    </script>
+</body>
+</html>
+
+
+

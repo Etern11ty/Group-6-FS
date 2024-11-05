@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seat Confirmation</title>
+    <link rel="stylesheet" href="/static/selectseatsstyle.css">
+</head>
+<body>
+    <div class="background-image-container">
+        <div class="confirmation-container">
+            <h2>Seat Booking Confirmation</h2>
+
+            <div class="confirmation-details">
+                <p>Thank you for booking with us!</p>
+                <p>Flight ID: <strong>{{ flight_id }}</strong></p>
+                <p>Selected Seat: <strong>{{ seat }}</strong></p>
+                <p>Your seat has been successfully reserved.</p>
+            </div>
+
+            <button onclick="window.location.href='/'" class="back-home-button">Back to Homepage</button>
+        </div>
+    </div>
+</body>
+</html>
