@@ -90,11 +90,11 @@ def search_results():
     travellers = request.form['travellers_class']
     departure_date = request.form['departure_date'] or datetime.now().strftime('%Y-%m-%d')
     return_date = request.form.get('return_date') or (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
-
+    
     # Fetch outbound flights with departure and destination details
     response = supabase.table("flight_information").select("flight_number, departure, destination, departure_time, arrival_time,aircraft, dest, origin") \
-        .eq("departure", from_city) \
-        .eq("destination", to_city) \
+        .ilike("departure", f"%{from_city}%") \
+        .ilike("destination", f"%{to_city}%") \
         .eq("date", departure_date) \
         .execute()
     matching_flights = response.data if response.data else []
@@ -110,8 +110,8 @@ def search_results():
     return_flights = []
     if trip_type != "oneway":
         response_return = supabase.table("flight_information").select("flight_number, departure, destination, departure_time, arrival_time,aircraft, dest, origin") \
-            .eq("departure", to_city) \
-            .eq("destination", from_city) \
+            .ilike("destination", f"%{to_city}%") \
+            .ilike("departure", f"%{from_city}%") \
             .eq("date", return_date) \
             .execute()
         return_flights = response_return.data if response_return.data else []
