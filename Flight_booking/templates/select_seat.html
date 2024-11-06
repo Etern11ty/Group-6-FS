@@ -94,7 +94,7 @@
     </style>
 </head>
 <body>
-    <h2>Select a Seat for Flight ID: {{ flight_id }}</h2>
+    <h2>Select a Seat for booing ID: {{ bookingid }}</h2>
 
     <div class="seat-container">
         {% for row in range(1, 31) %}  
@@ -115,7 +115,7 @@
     </div>
     
 
-    <form method="POST" action="/confirm_seat/{{ flight_id }}">
+    <form method="POST" action="/confirm_seat/{{ bookingid  }}">
         <input type="hidden" id="selected_seat" name="seat">
         <div style="display: flex; justify-content: center; margin-top: 20px;">
             <button type="submit" class="confirm-button">Confirm Seat</button>

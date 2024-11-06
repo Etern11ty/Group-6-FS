@@ -33,13 +33,13 @@
             background-image: url('{{ url_for('static', filename='homepage/images/Background.jpg') }}');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed; /* 让背景在页面滚动时保持静止 */
+            background-attachment: fixed;
             display: flex;
-            flex-direction: column;  /* 垂直排列 */
-            justify-content: flex-start;  /* 元素靠上排列 */
+            flex-direction: column;  
+            justify-content: flex-start;
             align-items: center;
             position: relative;
-            padding-top: 150px;  /* 向下移动150px，确保汉堡菜单不会被遮挡 */
+            padding-top: 150px;  
         }
     </style>
 </head>
@@ -47,8 +47,10 @@
 
     <!-- Top navigation bar -->
     <div class="top-nav">
+        {% if current_username != "Login / Sign up" %}
+            Welcome,
+        {% endif %}
         <a href="{{ url_for('login_page') }}">{{ current_username }}</a>
-        <a href="{{ url_for('passenger_info') }}">passenger information</a>
     </div>
 
     <!-- Fixed Menu with Background Image -->

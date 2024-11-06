@@ -109,7 +109,7 @@
                     </div>
                 </div>
                 <!-- Go to Select Seat Button -->
-                <form action="{{ url_for('select_seat', flight_id=booking.flightnumber) }}" method="get">
+                <form action="{{ url_for('select_seat', bookingid=booking.bookingid) }}" method="get">
                     <button type="submit" class="select-seat">Go to Select Seat</button>
                 </form>
             </div>
