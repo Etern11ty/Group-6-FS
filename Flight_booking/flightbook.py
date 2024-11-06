@@ -298,6 +298,7 @@ def passenger_info():
 def process_payment():
     return render_template('loading.html'), 200
     
+    
 @app.route('/finalize_payment')
 def finalize_payment():
 
