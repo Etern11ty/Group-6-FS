@@ -344,11 +344,6 @@ def paymentsuccess():
 
     return render_template('paymentsuccess.html', flight_info=flight_info, passenger_info=passenger_info)
 
-# @app.route('/select_seat', methods=['GET'])
-# def select_seat():
-#     flight_number = request.args.get('flight_number')
-#     return render_template('select_seat.html', flight_number=flight_number)
-
 @app.route('/view_booking_history')
 def view_booking_history():
     return render_template('booking_history.html')
@@ -371,31 +366,32 @@ def view_passenger_data():
         return f"An error occurred while trying to fetch data from Supabase: {str(e)}", 500
     
     
-@app.route('/select_seat/<string:flight_id>', methods=['GET', 'POST'])
-def select_seat(flight_id):
+@app.route('/select_seat/<string:bookingid>', methods=['GET', 'POST'])
+def select_seat(bookingid):
     current_username = session.get('current_username')
     if not current_username:
         return "User not authenticated", 401
 
-    user_seat_response = supabase.table("seats").select("*").eq("flight_id", flight_id).eq("username", current_username).execute()
+    user_seat_response = supabase.table("seats").select("*").eq("bookingid", bookingid).eq("username", current_username).execute()
     
     response = user_seat_response.data[0]
+
+    flight_id = response['flight_id']
+
     
     if response['status'] == 'occupied':
  
         selected_seat = response['seat_number']
-        return redirect(url_for('seat_confirmation', flight_id=flight_id, seat=selected_seat))
+        return redirect(url_for('seat_confirmation', bookingid=bookingid, seat=selected_seat))
 
-    response = supabase.table("seats").select("*").eq("flight_id", flight_id).execute()
+    response = supabase.table("seats").select("*").eq("flight_id ", flight_id).execute()
     seats = response.data if response.data else []
 
-    return render_template('select_seat.html', seats=seats, flight_id=flight_id)
+    return render_template('select_seat.html', seats=seats, bookingid=bookingid)
 
 
-
-
-@app.route('/confirm_seat/<string:flight_id>', methods=['GET', 'POST'])
-def confirm_seat(flight_id):
+@app.route('/confirm_seat/<string:bookingid>', methods=['GET', 'POST'])
+def confirm_seat(bookingid):
 
     current_username = session.get('current_username')
     if not current_username:
@@ -404,13 +400,13 @@ def confirm_seat(flight_id):
 
     if request.method == 'GET':
      
-        seat_response = supabase.table("seats").select("*").eq("flight_id", flight_id).execute()
+        seat_response = supabase.table("seats").select("*").eq("bookingid", bookingid).execute()
         if seat_response.error:
             return f"Error fetching seat data: {seat_response.error}", 500
         
         seats = seat_response.data if seat_response.data else []
   
-        return render_template('confirm_seat.html', flight_id=flight_id, seats=seats)
+        return render_template('confirm_seat.html', bookingid=bookingid, seats=seats)
 
     elif request.method == 'POST':
    
@@ -420,7 +416,7 @@ def confirm_seat(flight_id):
             return "No seat selected", 400
         
 
-        seat_response = supabase.table("seats").select("seat_number").eq("flight_id", flight_id).execute()
+        seat_response = supabase.table("seats").select("seat_number").eq("bookingid", bookingid).execute()
         
         seat_numbers = [seat['seat_number'] for seat in seat_response.data]
 
@@ -430,12 +426,11 @@ def confirm_seat(flight_id):
         if selected_seat in seat_numbers:
             return "Seat is already booked. Please choose another seat.", 400
 
-
         try:
             response = supabase.table("seats").update({
                 "status": "occupied",
                 "seat_number": selected_seat,
-            }).eq("flight_id", flight_id).eq("username", current_username).execute()
+            }).eq("bookingid", bookingid).eq("username", current_username).execute()
 
             print(f"Update Seat Response: {response}")
 
@@ -445,11 +440,11 @@ def confirm_seat(flight_id):
         except Exception as e:
             return f"An error occurred while booking the seat: {str(e)}", 500
 
-        return redirect(url_for('seat_confirmation', flight_id=flight_id, seat=selected_seat))
+        return redirect(url_for('seat_confirmation', bookingid=bookingid, seat=selected_seat))
 
-@app.route('/seat_confirmation/<string:flight_id>/<string:seat>')
-def seat_confirmation(flight_id, seat):
-    return render_template('confirm_seat.html', flight_id=flight_id, seat=seat)
+@app.route('/seat_confirmation/<string:bookingid>/<string:seat>')
+def seat_confirmation(bookingid, seat):
+    return render_template('confirm_seat.html', bookingid=bookingid, seat=seat)
 
 
 
