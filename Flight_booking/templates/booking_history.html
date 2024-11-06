@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking History</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='homepage/css/booking_history.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bookinghistory/css/booking_history.css') }}">
     <style>
         .booking-history {
             max-width: 800px;
@@ -99,6 +99,7 @@
                     <div class="info-section">
                         <p class="airline">Flight Number: {{ booking.flightnumber }}</p>
                         <p>Booking date: {{ booking.purchase_time }}</p>
+                        <p>Departure Date: {{ booking.date }}</p>
                         <p>Departure: {{ booking.dept_time }}</p>
                         <p>Arrival: {{ booking.arrive_time }}</p>
                         <p>First Name: {{ booking.first_name }}</p>
@@ -108,7 +109,7 @@
                     </div>
                 </div>
                 <!-- Go to Select Seat Button -->
-                <form action="{{ url_for('select_seat', flight_id=booking.flightnumber) }}" method="get">
+                <form action="{{ url_for('select_seat', bookingid=booking.bookingid) }}" method="get">
                     <button type="submit" class="select-seat">Go to Select Seat</button>
                 </form>
             </div>
