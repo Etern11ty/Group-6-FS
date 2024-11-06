@@ -1,0 +1,5 @@
+| Name          | Task Description                       | Contribution Details                                                                   | Status   |
+|---------------|----------------------------------------|----------------------------------------------------------------------------------------|----------|
+| Zhongren Zhao | Backend Development & UI Integration   | Creating database, developed UI, code for register page, optimized the program, merged branches, completed test scripts and tests, and finalized the README (project guide). | Complete |
+| Yueyi Huang   | Booking History Page Development & Searching Detail Page Development     | Developed UI, code for booking history page and flight detail page, add loading process.                         | Complete |
+| Wanting Huang | Selecting Seats Page Development & Payment Page Development       | Developed UI, code for payment page and selecting seats page, merged branches from other members, completed test scripts and tests. | Complete |
