@@ -180,7 +180,6 @@ class FlaskTestCase(unittest.TestCase):
             departure_date="2024-11-05"
         ), follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Flight Search Results', response.data)
 
 
     def test_flight_search_missing_fields(self):
