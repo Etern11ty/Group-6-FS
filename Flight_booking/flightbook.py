@@ -42,12 +42,6 @@ def index():
     current_username = session.get('current_username', "Login / Sign up")
     return render_template('homepage.html', current_username=current_username)
 
-    
-
-@app.route('/flights')
-def flights():
-    return render_template('homepage.html')
-
 
 @app.route('/booking-history')
 def booking_history():
@@ -70,10 +64,6 @@ def booking_history():
 def login_page():
     error = session.pop('error', None)
     return render_template('login.html', error=error)
-
-@app.route('/cart')
-def cart():
-    return 'cart.html'
 
 
 @app.route('/logout')
@@ -207,13 +197,11 @@ def register():
 
     return render_template('register.html')
 
-@app.route('/login_1')
-def login_1():
-    return render_template('login.html')
+# @app.route('/login_1')
+# def login_1():
+#     return render_template('login.html')
 
 
-# Mock backend storage, a list to store passager data
-passengers_data_store = []
 
 @app.route('/')
 def home():
@@ -283,15 +271,16 @@ def passenger_info():
     # if GET request，return passenger info page
     try:
         response = supabase.table("passenger_information").select("*").eq("username", current_username).execute()
+        if hasattr(response, 'error') and response.error:
+            return f"An error occurred while fetching data: {response.error}", 500
         if response.data:
-            # If data exists, pass it to the template
-            existing_data = response.data[0]  # Get the first matching row
-            return render_template('booking.html', existing_data=existing_data)
+            existing_data = response.data[0]
+            return render_template("booking.html", existing_data=existing_data)
         else:
-            # If no existing data, render an empty form
-            return render_template('booking.html', existing_data=None)
+            return render_template("booking.html", existing_data=None)
     except Exception as e:
         return f"An error occurred while fetching data: {str(e)}", 500
+
 
 
 @app.route('/process_payment', methods=['POST'])
@@ -339,8 +328,8 @@ def paymentsuccess():
     if not flight_info or not passenger_info:
         return "Missing booking data", 400
 
-    print("Flight info:", flight_info)
-    print("Passenger info:", passenger_info)
+    # print("Flight info:", flight_info)
+    # print("Passenger info:", passenger_info)
 
     return render_template('paymentsuccess.html', flight_info=flight_info, passenger_info=passenger_info)
 
@@ -421,7 +410,7 @@ def confirm_seat(bookingid):
         seat_numbers = [seat['seat_number'] for seat in seat_response.data]
 
         
-        print(seat_numbers)
+        # print(seat_numbers)
         
         if selected_seat in seat_numbers:
             return "Seat is already booked. Please choose another seat.", 400
@@ -432,7 +421,7 @@ def confirm_seat(bookingid):
                 "seat_number": selected_seat,
             }).eq("bookingid", bookingid).eq("username", current_username).execute()
 
-            print(f"Update Seat Response: {response}")
+            # print(f"Update Seat Response: {response}")
 
             if not response or not response.data:
                 return "Failed to book seat. Please try again later.", 500
