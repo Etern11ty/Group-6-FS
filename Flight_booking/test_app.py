@@ -3,12 +3,28 @@ from flightbook import app
 import random
 from flask import session
 from unittest.mock import patch, MagicMock
+import os
 
 
 class FlaskTestCase(unittest.TestCase):
     def setUp(self):
         # Initialize the test client before each test case
         self.tester = app.test_client()
+        app.testing = True
+        app.config['PROPAGATE_EXCEPTIONS'] = True
+        self.tester = app.test_client()
+
+    
+
+    @patch("flightbook.app.run")
+    @patch("os.environ.get")
+    def test_port_config(self, mock_environ_get, mock_run):
+        mock_environ_get.return_value = "8080"
+        port = int(os.environ.get("PORT", 8080))
+        app.run(host="0.0.0.0", port=port)
+
+        mock_run.assert_called_once_with(host="0.0.0.0", port=8080)
+
     
 
     def test_home(self):
@@ -490,6 +506,208 @@ class FlaskTestCase(unittest.TestCase):
         self.assertIn(b'No seat selected', response.data)
 
 
+
+    def test_finalize_payment_missing_booking_data(self):
+        # Clear session data
+        with self.tester.session_transaction() as sess:
+            sess.pop('flight_info', None)
+            sess.pop('passenger_data', None)
+
+        response = self.tester.get('/finalize_payment', follow_redirects=True)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b'Missing booking data', response.data)
+
+    @patch('flightbook.supabase')
+    def test_passenger_info_get_exception(self, mock_supabase):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+
+        # Simulate an exception when fetching data
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.side_effect = Exception('Database Error')
+
+        response = self.tester.get('/passenger_info')
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(b'An error occurred while fetching data: Database Error', response.data)
+
+
+    @patch('flightbook.supabase')
+    def test_passenger_info_get_no_data(self, mock_supabase):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+
+        # Simulate no data returned
+        mock_response = MagicMock()
+        mock_response.data = []
+        mock_response.error = None
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_response
+
+        response = self.tester.get('/passenger_info')
+        self.assertEqual(response.status_code, 200)
+        # Adjust based on what your template displays when there's no data
+        self.assertIn(b'Passenger Information', response.data)
+
+
+
+    def test_passenger_info_missing_required_fields(self):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+        
+        data = {
+            # Missing 'first_name_1'
+            'last_name_1': 'Doe',
+            'email_1': 'johndoe@example.com',
+            'phone_1': '1234567890',
+            'dob_1': '1990-01-01',
+            'address1_1': '123 Test St',
+            'country_1': 'USA',
+            'city_1': 'Test City',
+            'postal_code_1': '10001',
+            'em_first_name': 'Jane',
+            'em_last_name': 'Doe',
+            'em_phone': '0987654321',
+            'em_email': 'janedoe@example.com'
+        }
+
+        response = self.tester.post('/passenger_info', data=data, follow_redirects=True)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b'Missing required field', response.data)
+
+    def test_passenger_info_invalid_date_format(self):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+        
+        data = {
+            'first_name_1': 'John',
+            'last_name_1': 'Doe',
+            'email_1': 'johndoe@example.com',
+            'phone_1': '1234567890',
+            'dob_1': 'invalid-date',
+            'address1_1': '123 Test St',
+            'country_1': 'USA',
+            'city_1': 'Test City',
+            'postal_code_1': '10001',
+            'em_first_name': 'Jane',
+            'em_last_name': 'Doe',
+            'em_phone': '0987654321',
+            'em_email': 'janedoe@example.com'
+        }
+
+        response = self.tester.post('/passenger_info', data=data, follow_redirects=True)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b'Invalid date format for birthday', response.data)
+
+
+
+    def test_paymentsuccess_missing_booking_data(self):
+        # Clear session data
+        with self.tester.session_transaction() as sess:
+            sess.pop('flight_info', None)
+            sess.pop('passenger_data', None)
+
+        response = self.tester.get('/paymentsuccess', follow_redirects=True)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b'Missing booking data', response.data)
+
+
+
+    @patch('flightbook.supabase')
+    def test_confirm_seat_exception(self, mock_supabase):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+
+        # Mock the select chain
+        mock_select = MagicMock()
+        mock_select.eq.return_value = mock_select  # First eq()
+        mock_select.eq.return_value = mock_select  # Second eq()
+        mock_select.execute.return_value.data = []
+        mock_supabase.table.return_value.select.return_value = mock_select
+
+        # Mock the update chain
+        mock_update = MagicMock()
+        mock_update.eq.return_value = mock_update  # First eq()
+        mock_update.eq.return_value = mock_update  # Second eq()
+        mock_update.execute.side_effect = Exception('Database Error')
+        mock_supabase.table.return_value.update.return_value = mock_update
+
+        response = self.tester.post('/confirm_seat/123', data={'seat': '4A'}, follow_redirects=False)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(b'An error occurred while booking the seat: Database Error', response.data)
+
+
+
+    def test_booking_history_unauthenticated(self):
+        # Ensure no user is logged in
+        with self.tester.session_transaction() as sess:
+            sess.pop('current_username', None)
+
+        response = self.tester.get('/booking-history', follow_redirects=True)
+        self.assertEqual(response.status_code, 401)
+        self.assertIn(b'User not authenticated', response.data)
+
+
+    @patch('flightbook.supabase')
+    def test_booking_history_no_bookings(self, mock_supabase):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+
+        # Simulate no bookings returned
+        mock_response = MagicMock()
+        mock_response.data = []
+        mock_response.error = None
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_response
+
+        response = self.tester.get('/booking-history', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        # Adjust the assertion based on your template
+        self.assertIn(b'You have no bookings.', response.data)
+
+
+    def test_select_seat_unauthenticated(self):
+        # Ensure no user is logged in
+        with self.tester.session_transaction() as sess:
+            sess.pop('current_username', None)
+
+        response = self.tester.get('/select_seat/123', follow_redirects=True)
+        self.assertEqual(response.status_code, 401)
+        self.assertIn(b'User not authenticated', response.data)
+
+
+
+    @patch('flightbook.supabase')
+    def test_select_seat_already_occupied(self, mock_supabase):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+
+        # Mock the select chain
+        mock_select = MagicMock()
+        mock_select.eq.return_value = mock_select  # First eq()
+        mock_select.eq.return_value = mock_select  # Second eq()
+        mock_select.execute.return_value.data = [{'status': 'occupied', 'seat_number': '4A', 'flight_id': 'flight123'}]
+        mock_supabase.table.return_value.select.return_value = mock_select
+
+        response = self.tester.get('/select_seat/booking123', follow_redirects=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/seat_confirmation/booking123/4A', response.headers['Location'])
+
+
+
+
+
+    def test_home_redirects_to_passenger_info(self):
+        response = self.tester.get('/home_redirect', follow_redirects=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/passenger_info', response.headers['Location'])
+
+    def test_view_booking_history_page(self):
+        response = self.tester.get('/view_booking_history')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Booking History', response.data)  # Adjust based on your template
+
+
+    def test_go_home_redirects_to_index(self):
+        response = self.tester.get('/home', follow_redirects=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers['Location'], '/')
 
 if __name__ == "__main__":
     unittest.main()

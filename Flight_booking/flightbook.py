@@ -202,7 +202,6 @@ def register():
 #     return render_template('login.html')
 
 
-
 @app.route('/')
 def home():
     return redirect(url_for('passenger_info'))
@@ -342,17 +341,6 @@ def go_home():
     return redirect(url_for('index'))
 
 
-
-@app.route('/view_passenger_data')
-def view_passenger_data():
-    try:
-        response = supabase.table("passenger_infomation").select("*").execute()
-        if response.get('error'):
-            return f"Error fetching passenger data: {response['error']}", 500
-        else:
-            return {"passenger_data": response['data']}
-    except Exception as e:
-        return f"An error occurred while trying to fetch data from Supabase: {str(e)}", 500
     
     
 @app.route('/select_seat/<string:bookingid>', methods=['GET', 'POST'])
@@ -369,9 +357,9 @@ def select_seat(bookingid):
 
     
     if response['status'] == 'occupied':
- 
         selected_seat = response['seat_number']
         return redirect(url_for('seat_confirmation', bookingid=bookingid, seat=selected_seat))
+
 
     response = supabase.table("seats").select("*").eq("flight_id ", flight_id).execute()
     seats = response.data if response.data else []
@@ -434,6 +422,11 @@ def confirm_seat(bookingid):
 @app.route('/seat_confirmation/<string:bookingid>/<string:seat>')
 def seat_confirmation(bookingid, seat):
     return render_template('confirm_seat.html', bookingid=bookingid, seat=seat)
+
+@app.route('/home_redirect')
+def home_redirect():
+    return redirect(url_for('passenger_info'))
+
 
 
 

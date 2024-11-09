@@ -92,28 +92,34 @@
 <body>
     <div class="booking-history">
         <h1>Booking History</h1>
-        {% for booking in bookings %}
-            <div class="booking-card">
-                <div class="flight-details">
-                    <h2>{{ booking.origin }} → {{ booking.dest }}</h2>
-                    <div class="info-section">
-                        <p class="airline">Flight Number: {{ booking.flightnumber }}</p>
-                        <p>Booking date: {{ booking.purchase_time }}</p>
-                        <p>Departure Date: {{ booking.date }}</p>
-                        <p>Departure: {{ booking.dept_time }}</p>
-                        <p>Arrival: {{ booking.arrive_time }}</p>
-                        <p>First Name: {{ booking.first_name }}</p>
-                        <p>Last Name: {{ booking.last_name }}</p>
-                        <p>Check-in Baggage: 23kg/person</p>
-                        <p>Carry-on Baggage: 7kg/person</p>
+        {% if bookings %}
+            {% for booking in bookings %}
+                <div class="booking-card">
+                    <div class="flight-details">
+                        <h2>{{ booking.origin }} → {{ booking.dest }}</h2>
+                        <div class="info-section">
+                            <p class="airline">Flight Number: {{ booking.flightnumber }}</p>
+                            <p>Booking date: {{ booking.purchase_time }}</p>
+                            <p>Departure Date: {{ booking.date }}</p>
+                            <p>Departure: {{ booking.dept_time }}</p>
+                            <p>Arrival: {{ booking.arrive_time }}</p>
+                            <p>First Name: {{ booking.first_name }}</p>
+                            <p>Last Name: {{ booking.last_name }}</p>
+                            <p>Check-in Baggage: 23kg/person</p>
+                            <p>Carry-on Baggage: 7kg/person</p>
+                        </div>
                     </div>
+                    <!-- Go to Select Seat Button -->
+                    <form action="{{ url_for('select_seat', bookingid=booking.bookingid) }}" method="get">
+                        <button type="submit" class="select-seat">Go to Select Seat</button>
+                    </form>
                 </div>
-                <!-- Go to Select Seat Button -->
-                <form action="{{ url_for('select_seat', bookingid=booking.bookingid) }}" method="get">
-                    <button type="submit" class="select-seat">Go to Select Seat</button>
-                </form>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p>You have no bookings.</p>
+        {% endif %}
+
+    </div>
         <form action="{{ url_for('index') }}" method="get">
             <button type="submit" class="back-button">Back to Homepage</button>
         </form>
