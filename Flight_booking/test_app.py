@@ -708,6 +708,12 @@ class FlaskTestCase(unittest.TestCase):
         response = self.tester.get('/home', follow_redirects=False)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers['Location'], '/')
+        
+    def test_register_page_load(self):
+        response = self.tester.get('/register')
+        self.assertEqual(response.status_code, 200)
+        
+
 
 if __name__ == "__main__":
     unittest.main()
