@@ -691,12 +691,11 @@ class FlaskTestCase(unittest.TestCase):
 
 
 
-
-
     def test_home_redirects_to_passenger_info(self):
         response = self.tester.get('/home_redirect', follow_redirects=False)
         self.assertEqual(response.status_code, 302)
-        self.assertIn('/passenger_info', response.headers['Location'])
+        self.assertIn('/passenger_info', response.headers['Location'],'/')
+        
 
     def test_view_booking_history_page(self):
         response = self.tester.get('/view_booking_history')
@@ -712,6 +711,31 @@ class FlaskTestCase(unittest.TestCase):
     def test_register_page_load(self):
         response = self.tester.get('/register')
         self.assertEqual(response.status_code, 200)
+        
+    @patch('flightbook.supabase')
+    def test_passenger_info_existing_data(self, mock_supabase):
+        # Set up session to include current username
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+
+        # Mock Supabase response to simulate existing data
+        mock_response = MagicMock()
+        mock_response.data = [{
+            'username': 'test_user',
+            'firstname': 'John',
+            'lastname': 'Doe',
+            'emailaddress': 'johndoe@example.com'
+        }]
+        mock_response.error = None
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_response
+
+        # Perform the GET request to `/passenger_info`
+        response = self.tester.get('/passenger_info')
+
+        # Assertions to ensure lines 276-277 are covered
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'John', response.data)
+        self.assertIn(b'Doe', response.data)
         
 
 
