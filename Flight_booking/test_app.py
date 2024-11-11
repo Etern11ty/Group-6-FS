@@ -691,11 +691,6 @@ class FlaskTestCase(unittest.TestCase):
 
 
 
-    def test_home_redirects_to_passenger_info(self):
-        response = self.tester.get('/home_redirect', follow_redirects=False)
-        self.assertEqual(response.status_code, 302)
-        self.assertIn('/passenger_info', response.headers['Location'],'/')
-        
 
     def test_view_booking_history_page(self):
         response = self.tester.get('/view_booking_history')
@@ -744,7 +739,110 @@ class FlaskTestCase(unittest.TestCase):
         # Assertions to ensure line 375 is covered
         self.assertEqual(response.status_code, 401)
         self.assertIn(b'User not authenticated', response.data)
-        
+
+    @patch('flightbook.supabase')
+    def test_confirm_seat_post_response_none(self, mock_supabase):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+
+        # Mock the select chain to indicate seat not booked
+        mock_seat_select = MagicMock()
+        mock_seat_select.eq.return_value = mock_seat_select
+        mock_seat_select.execute.return_value.data = []
+        mock_supabase.table.return_value.select.return_value = mock_seat_select
+
+        # Mock the update chain to return response with data as None
+        mock_update_response = MagicMock()
+        mock_update_response.data = None
+        mock_supabase.table.return_value.update.return_value.eq.return_value.eq.return_value.execute.return_value = mock_update_response
+
+        response = self.tester.post('/confirm_seat/123', data={'seat': '4A'}, follow_redirects=False)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(b'Failed to book seat. Please try again later.', response.data)
+
+
+    @patch('flightbook.supabase')
+    def test_confirm_seat_get_seat_response_error(self, mock_supabase):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+
+        # Mock seat_response to have an error
+        mock_seat_response = MagicMock()
+        mock_seat_response.data = None
+        mock_seat_response.error = 'Mocked Seat Response Error'
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_seat_response
+
+        response = self.tester.get('/confirm_seat/123', follow_redirects=False)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(b'Error fetching seat data: Mocked Seat Response Error', response.data)
+
+
+    @patch('flightbook.supabase')
+    def test_select_seat_render_template(self, mock_supabase):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+
+           # Mock the booking response to return a flight number
+        mock_booking_response = MagicMock()
+        mock_booking_response.data = [{'flightnumber': 'AC1001'}]
+        mock_booking_response.error = None
+
+        # Mock the flight response to return a flight ID
+        mock_flight_response = MagicMock()
+        mock_flight_response.data = [{'id': 'AC1001'}]
+        mock_flight_response.error = None
+
+        # Mock user_seat_response to simulate that the user has a seat but it's not occupied
+        mock_user_seat_response = MagicMock()
+        mock_user_seat_response.data = [{'status': 'available', 'seat_number': None}]
+        mock_user_seat_response.error = None
+        # Mock response for seats
+        mock_seats_response = MagicMock()
+        mock_seats_response.data = [
+            {'seat_number': '1A', 'flight_id': "AC1001", 'status': 'available'},
+            {'seat_number': '1B', 'flight_id': "AC1001",  'status': 'occupied'}
+        ]
+        mock_seats_response.error = None
+        # Adjust the chain of return values to match the order of method calls
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_seats_response
+
+        response = self.tester.get('/select_seat/booking123', follow_redirects=False)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Select a Seat for booking ID:', response.data)
+
+    @patch('flightbook.supabase')
+    def test_passenger_info_upsert_success_no_updated_data(self, mock_supabase):
+        with self.tester.session_transaction() as sess:
+            sess['current_username'] = 'test_user'
+        data = {
+            'first_name_1': 'John', 'last_name_1': 'Doe', 'email_1': 'johndoe@example.com',
+            'phone_1': '1234567890', 'dob_1': '1990-01-01', 'address1_1': '123 Test St',
+            'country_1': 'USA', 'city_1': 'Test City', 'postal_code_1': '10001',
+            'em_first_name': 'Jane', 'em_last_name': 'Doe', 'em_phone': '0987654321', 'em_email': 'janedoe@example.com'
+        }
+        # Mock upsert response with no error
+        mock_upsert_response = MagicMock()
+        mock_upsert_response.error = None
+        mock_supabase.table.return_value.upsert.return_value.execute.return_value = mock_upsert_response
+
+        # Mock select response with data as None
+        mock_select_response = MagicMock()
+        mock_select_response.data = None
+        mock_select_response.error = None
+        mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_select_response
+
+        response = self.tester.post('/passenger_info', data=data, follow_redirects=True)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(b'Error retrieving updated data', response.data)
+
+    def test_home_redirect(self):
+        response = self.tester.get('/home_redirect', follow_redirects=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/passenger_info', response.headers['Location'])
+
+
+
+
 
 
 if __name__ == "__main__":

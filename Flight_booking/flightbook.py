@@ -25,10 +25,6 @@ response2 = supabase.table("flight_information").select("*").execute()
 
 app.secret_key = 'aa2233'
 
-# username_list = ["aaa", "123"]
-# password_list = ["aaa", "123"]
-# email_list = ["aaa@gmail.com", "123@gmail.com"]
-
 
 flight_list = supabase.table("flight_information").select("*").execute().data
 
@@ -37,8 +33,6 @@ flight_list = supabase.table("flight_information").select("*").execute().data
 
 @app.route('/')
 def index():
-    # session['current_username'] = 'aaa'
-    
     current_username = session.get('current_username', "Login / Sign up")
     return render_template('homepage.html', current_username=current_username)
 
@@ -197,14 +191,12 @@ def register():
 
     return render_template('register.html')
 
-# @app.route('/login_1')
-# def login_1():
-#     return render_template('login.html')
 
 
-@app.route('/')
-def home():
-    return redirect(url_for('passenger_info'))
+# @app.route('/')
+# def home():
+#     return redirect(url_for('index'))
+
     
 
 
@@ -430,6 +422,6 @@ def home_redirect():
 
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     port = int(os.environ.get("PORT", 8080)) 
     app.run(host="0.0.0.0", port=port)  
