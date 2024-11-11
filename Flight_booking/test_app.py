@@ -736,6 +736,14 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'John', response.data)
         self.assertIn(b'Doe', response.data)
+    
+    def test_confirm_seat_unauthenticated(self):
+        # Make a GET request to `/confirm_seat/<bookingid>` without setting `current_username` in the session
+        response = self.tester.get('/confirm_seat/12345')  # Replace '12345' with any sample booking ID
+
+        # Assertions to ensure line 375 is covered
+        self.assertEqual(response.status_code, 401)
+        self.assertIn(b'User not authenticated', response.data)
         
 
 
