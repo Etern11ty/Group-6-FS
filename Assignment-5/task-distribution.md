@@ -1,0 +1,5 @@
+| Name          | Task Description                       | Contribution Details                                                                   | Status   |
+|---------------|----------------------------------------|----------------------------------------------------------------------------------------|----------|
+| Zhongren Zhao | Designed the test scenarios,Implementation of Test Scripts, Wrote Summary of the Test|  Wrote python code for the test of searching flights, selecting flights, successfully booking flights and when there is no remaining seats of the flight, ensuring compatibility with the project. | Complete |
+| Yueyi Huang   | Add more test scenarios,Implementation of Test Scripts, Wrote Summary of the Test| Wrote python code for the test when there is no flights and booking when the flight is full, ensuring compatibility with the project, wrote the summary of the test. | Complete |
+| Wanting Huang |  Add more test scenarios,Implementation of Test Scripts | a Wrote python code for the test. | Complete |
