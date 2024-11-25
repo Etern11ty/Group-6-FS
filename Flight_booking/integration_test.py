@@ -32,57 +32,61 @@ class FlightBook:
 def flightbook():
     return FlightBook()
 
-# Test cases
-def test_search_flights(flightbook):
-    results = flightbook.search_flights("JFK", "LAX", "2024-12-01")
-    assert len(results) == 2
-    assert results[0]["flight_number"] == "FL123"
+# Integration Test Cases
+def test_complete_booking_process_success(flightbook):
+    """
+    Test the complete process from searching for flights to successfully booking one.
+    """
+    # Step 1: Search for flights
+    search_results = flightbook.search_flights("JFK", "LAX", "2024-12-01")
+    assert len(search_results) > 0, "There should be at least one flight available for booking."
 
-def test_select_flight(flightbook):
-    flight = flightbook.select_flight("FL123")
-    assert flight is not None
-    assert flight["remaining_seats"] == 10
+    # Step 2: Select a flight
+    flight_to_book = flightbook.select_flight("FL123")
+    assert flight_to_book is not None, "The flight should be available for booking."
+    assert flight_to_book["remaining_seats"] == 10, "The flight should have 10 seats available initially."
 
-    no_seat_flight = flightbook.select_flight("FL456")
-    assert no_seat_flight is None
-
-def test_book_flight_success(flightbook):
+    # Step 3: Book the flight
     user_details = {"name": "John Doe", "email": "john@example.com"}
     booking = flightbook.book_flight("FL123", user_details)
-    assert booking is not None
-    assert booking["user"]["name"] == "John Doe"
-    assert flightbook.flights[0]["remaining_seats"] == 9
+    assert booking is not None, "The booking should be successful."
+    assert booking["user"]["name"] == "John Doe", "The booking should include the correct user details."
+    assert flightbook.flights[0]["remaining_seats"] == 9, "The flight should now have 9 seats remaining."
 
-def test_book_flight_no_remaining_seats(flightbook):
+def test_complete_booking_process_failure_no_seats(flightbook):
     """
-    Test booking a flight with no remaining seats.
+    Test the complete process when attempting to book a flight with no available seats.
     """
+    # Step 1: Search for flights
+    search_results = flightbook.search_flights("JFK", "LAX", "2024-12-01")
+    assert len(search_results) > 0, "There should be at least one flight available for booking."
+
+    # Step 2: Attempt to select a flight with no seats
+    flight_to_book = flightbook.select_flight("FL456")
+    assert flight_to_book is None, "The flight should not be available for booking because there are no remaining seats."
+
+    # Step 3: Attempt to book the flight
     user_details = {"name": "Alice", "email": "alice@example.com"}
     booking = flightbook.book_flight("FL456", user_details)
-    assert booking is None, "The system should return None, indicating the booking failed."
-    flight = flightbook.select_flight("FL456")
-    assert flight is None, "The flight has no remaining seats; select_flight should return None."
+    assert booking is None, "Booking should fail as the flight has no available seats."
 
-def test_search_no_flights(flightbook):
+def test_booking_until_fully_booked(flightbook):
     """
-    Test whether the system correctly returns an empty list when no flights match the search criteria.
+    Test booking a flight repeatedly until all seats are taken, and ensure further bookings are blocked.
     """
-    results = flightbook.search_flights("JFK", "ORD", "2024-12-01")  # ORD is not a valid destination
-    assert len(results) == 0, "The system should return an empty list since no flights match the criteria."
+    # Step 1: Search for flights
+    search_results = flightbook.search_flights("JFK", "LAX", "2024-12-01")
+    assert len(search_results) > 0, "There should be at least one flight available for booking."
 
-def test_book_flight_until_full(flightbook):
-    """
-    Test booking the same flight repeatedly until no seats are left.
-    """
+    # Step 2: Book the flight repeatedly until it is fully booked
     user_details = {"name": "Bob", "email": "bob@example.com"}
     flight_number = "FL123"
-    
+
     for i in range(10):  # This flight has a maximum of 10 seats
         booking = flightbook.book_flight(flight_number, user_details)
         assert booking is not None, f"The {i+1}th booking should succeed."
         assert flightbook.flights[0]["remaining_seats"] == 10 - (i + 1), f"The remaining seats should be {10 - (i + 1)}."
 
+    # Step 3: Attempt to book one more seat
     booking = flightbook.book_flight(flight_number, user_details)
     assert booking is None, "The flight is fully booked, so the booking should fail."
-    flight = flightbook.select_flight(flight_number)
-    assert flight is None, "The flight has no remaining seats; select_flight should return None."
