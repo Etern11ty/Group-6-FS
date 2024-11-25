@@ -2,8 +2,9 @@ import unittest
 from flightbook import app
 import re
 from flask import session
-
-class IntegrationTestCase(unittest.TestCase):
+import random
+import string
+class FlightBookingIntegrationTest(unittest.TestCase):
     def setUp(self):
         # Initialize the test client before each test case
         self.tester = app.test_client()
@@ -85,6 +86,68 @@ class IntegrationTestCase(unittest.TestCase):
         booking_history_response = self.tester.get('/booking-history', follow_redirects=True)
         self.assertEqual(booking_history_response.status_code, 200)
         self.assertIn(flight_number.encode(), booking_history_response.data)
+
+class UserRegistrationAndSearchIntegrationTest(unittest.TestCase):
+    def setUp(self):
+        # Initialize the test client before each test case
+        self.tester = app.test_client()
+        app.testing = True
+        app.config['PROPAGATE_EXCEPTIONS'] = True
+
+    def generate_unique_username(self):
+        # Generate a unique username for each test run
+        return 'user_' + ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+    
+    def generate_unique_email(self):
+        return 'user_' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=8)) + '@example.com'
+
+    def test_user_registration_and_flight_search(self):
+        # Step 1: Register a new user
+        unique_username = 'user_' + ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+        unique_email = self.generate_unique_email()
+        registration_data = dict(
+            username=unique_username,
+            password="newpassword",
+            confirm_password="newpassword",
+            email=unique_email
+        )
+        registration_response = self.tester.post('/register', data=registration_data, follow_redirects=True)
+        self.assertEqual(registration_response.status_code, 200)
+        
+        # Verify that the username appears on the redirected page
+        registration_response_text = registration_response.data.decode('utf-8')
+        self.assertIn(unique_username, registration_response_text, "Username not found on the registration success page.")
+
+        # Step 2: Log in as the new user
+        login_response = self.tester.post('/login', data=dict(
+            username=unique_username,
+            password="newpassword"
+        ), follow_redirects=True)
+        self.assertEqual(login_response.status_code, 200)
+        self.assertIn(b'Welcome', login_response.data)
+
+        # Step 3: Search for flights
+        search_data = dict(
+            trip="oneway",
+            from_city="Paris",
+            to_city="New York",
+            travellers_class="2 Travellers",
+            departure_date="2024-12-15",
+        )
+        search_response = self.tester.post('/search-results', data=search_data, follow_redirects=True)
+        self.assertEqual(search_response.status_code, 200)
+
+        # Verify that the search results contain valid data
+        search_page = search_response.data.decode('utf-8')
+        self.assertIn("Paris", search_page)
+        self.assertIn("New York", search_page)
+
+        # Ensure the user can log out
+        logout_response = self.tester.get('/logout', follow_redirects=True)
+        self.assertEqual(logout_response.status_code, 200)
+        self.assertIn(b'Login / Sign up', logout_response.data)  
+
+
 
 if __name__ == "__main__":
     unittest.main()
