@@ -14,16 +14,17 @@ class PDF(FPDF):
 
 # Initialize the PDF
 pdf = PDF()
+pdf.add_page()
 pdf.set_auto_page_break(auto=True, margin=15)
 
+pdf.set_font('Arial', 'B', 14)
+pdf.cell(0, 10, 'Test Summary', ln=True)
+pdf.set_font('Arial', '', 12)
 
-
-
-# Add content to the PDF
-content = """
+pdf.multi_cell(0, 10, '''
 IntegrationTestCase:
 
-Full Booking Process
+Full Booking Process:
 This script tests the full booking process in the system. It includes:
 - Logging in as an existing user.
 - Searching for flights.
@@ -32,24 +33,27 @@ This script tests the full booking process in the system. It includes:
 - Processing payment.
 - Finalizing payment.
 - Verifying the booking in the booking history.
+
 Purpose: To ensure that the entire flight booking flow works seamlessly from start to finish.
 
-IntegrationTestLoginAndSeatSelection
-This script focuses on the following:
-- Logging in as a newly created mock user.
+IntegrationTestLoginAndSeatSelection:
+This script focuses on:
+- Logging in as a mock user.
 - Viewing the user's booking history.
 - Simulating seat selection for a flight.
 - Logging out after the process.
-Purpose: To verify login functionality, the ability to view booking history, and select seats, ensuring all operations are completed correctly.
 
-IntegrationTestLoginAndSeatSelection
-This script focuses on the following:
-- Logging in as a newly created mock user.
-- Viewing the user's booking history.
-- Simulating seat selection for a flight.
-- Logging out after the process.
-Purpose: To verify login functionality, the ability to view booking history, and select seats, ensuring all operations are reflected in the system.
-"""
+Purpose: To verify login functionality, the ability to view booking history, and select seats, ensuring all operations are functional.
+
+UserRegistrationAndSearchIntegrationTest:
+This script tests:
+- Registering a new user.
+- Logging in as the new user.
+- Searching for flights with specific criteria.
+- Logging out after the search.
+
+Purpose: To ensure user registration and flight search functionality works correctly.
+''')
 
 # Add content for the test instructions
 pdf.add_page()
