@@ -1,7 +1,15 @@
 import unittest
 from flightbook import app
 import re
+import uuid
 from flask import session
+from supabase import create_client, Client
+import os
+
+
+supabase_url = os.getenv("SUPABASE_URL")
+supabase_key = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(supabase_url, supabase_key)
 
 class IntegrationTestCase(unittest.TestCase):
     def setUp(self):
@@ -85,6 +93,66 @@ class IntegrationTestCase(unittest.TestCase):
         booking_history_response = self.tester.get('/booking-history', follow_redirects=True)
         self.assertEqual(booking_history_response.status_code, 200)
         self.assertIn(flight_number.encode(), booking_history_response.data)
+        
+        
+        
+        
+class IntegrationTestLoginAndSeatSelection(unittest.TestCase):
+    def setUp(self):
+        self.tester = app.test_client()
+        app.testing = True
+        app.config['PROPAGATE_EXCEPTIONS'] = True
+        self.booking_id = "example_booking_id"  
+        self.mock_username = f"user_{uuid.uuid4().hex[:8]}"  
+
+        supabase.table("user_account").insert({
+            "Username": self.mock_username,
+            "Password": "testpass123",
+            "emailaddress": f"{self.mock_username}@example.com",
+        }).execute()
+
+    
+        supabase.table("seats").delete().eq("bookingid", self.booking_id).eq("seat_number", "10A").execute()
+
+  
+        supabase.table("seats").insert({
+            "bookingid": self.booking_id,
+            "username": self.mock_username,
+            "flight_id": "test_flight_id",
+            "seat_number": "10A",
+            "status": "available"
+        }).execute()
+
+    def tearDown(self):
+   
+        supabase.table("user_account").delete().eq("Username", self.mock_username).execute()
+        supabase.table("seats").delete().eq("bookingid", self.booking_id).execute()
+
+    def test_login_and_seat_selection(self):
+        # Step 1: Log in as the mock user
+        login_response = self.tester.post('/login', data=dict(
+            username=self.mock_username,
+            password="testpass123"
+        ), follow_redirects=True)
+        self.assertEqual(login_response.status_code, 200)
+        self.assertIn(b'Welcome', login_response.data)
+
+        # Step 2: View booking history
+        booking_history_response = self.tester.get('/booking-history', follow_redirects=True)
+        self.assertEqual(booking_history_response.status_code, 200)
+        self.assertIn(b'Booking History', booking_history_response.data)
+
+        # Step 3: Simulate seat selection
+        select_seat_response = self.tester.post(f'/select_seat/{self.booking_id}', data=dict(
+            seat="10A"
+        ), follow_redirects=True)
+        self.assertEqual(select_seat_response.status_code, 200)
+      
+
+        # Step 4: Log out
+        logout_response = self.tester.get('/logout', follow_redirects=True)
+        self.assertEqual(logout_response.status_code, 200)
+        self.assertIn(b'Login / Sign up', logout_response.data)
 
 if __name__ == "__main__":
     unittest.main()
