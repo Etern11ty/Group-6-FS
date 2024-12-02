@@ -7,6 +7,9 @@ import time
 import os
 import requests  # Added to check if the Flask app is up
 from werkzeug.serving import make_server  # Added to run the Flask app without blocking
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 
 flask_ready = Event()
 
@@ -90,7 +93,7 @@ def test_register_login_logout_registerfaild():
     except Exception as e:
         print(f"\nRegistration, registration password mismatch, login, and logout test failed: {e}\n")
 
-def test_search_flights():
+def test_booking_process():
     try:
         driver.get("http://127.0.0.1:5000/register")
         
@@ -115,13 +118,82 @@ def test_search_flights():
         
         time.sleep(2)
         
-        # Check the results page
-        assert "Paris" in driver.page_source
-        assert "New York" in driver.page_source
-        print("Search flights test passed.")
-    except Exception as e:
-        print(f"Search flights test failed: {e}")
 
+     # Select a flight
+        wait = WebDriverWait(driver, 10)
+        select_buttons = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "select-button")))
+        if not select_buttons:
+            raise Exception("No flights available to book.")
+        select_buttons[0].click()
+        time.sleep(2)
+        print("Flight selected.")
+
+        driver.find_element(By.XPATH, "//button[text()='Continue']").click()   
+        time.sleep(2)
+
+        driver.find_element(By.NAME, "first_name_1").send_keys("John")
+        driver.find_element(By.NAME, "last_name_1").send_keys("Doe")
+        driver.find_element(By.NAME, "dob_1").send_keys("001990--11--1")
+        driver.find_element(By.NAME, "id_number_1").send_keys("A1234567")
+        driver.find_element(By.NAME, "email_1").send_keys("johndoe@example.com")
+        driver.find_element(By.NAME, "phone_1").send_keys("1234567890")
+
+        # Address details
+        driver.find_element(By.NAME, "address1_1").send_keys("123 Main St")
+        driver.find_element(By.NAME, "address2_1").send_keys("Apt 4B")
+        driver.find_element(By.NAME, "country_1").send_keys("USA")
+        driver.find_element(By.NAME, "city_1").send_keys("New York")
+        driver.find_element(By.NAME, "postal_code_1").send_keys("10001")
+
+        # Emergency contact details
+        driver.find_element(By.NAME, "em_first_name").send_keys("Jane")
+        driver.find_element(By.NAME, "em_last_name").send_keys("Doe")
+        driver.find_element(By.NAME, "em_phone").send_keys("0987654321")
+        driver.find_element(By.NAME, "em_email").send_keys("janedoe@example.com")
+
+        # Bag information
+        driver.find_element(By.NAME, "bags").clear()  # Clear default value
+        driver.find_element(By.NAME, "bags").send_keys("2")  # Set number of bags
+
+        # Click the save and continue button
+        driver.find_element(By.CSS_SELECTOR, "button.save-btn").click()
+
+        driver.find_element(By.NAME, "payment_type").click()  # Select credit card by default
+        driver.find_element(By.NAME, "card_number").send_keys("1234 5678 9123 4567")
+        driver.find_element(By.NAME, "cardholder_name").send_keys("John K")
+        driver.find_element(By.NAME, "expiry_date").send_keys("12/25")  # MM/YY format
+        driver.find_element(By.NAME, "cvv").send_keys("123")
+
+        driver.find_element(By.CSS_SELECTOR, "button.pay-button").click()
+        print("Payment form submitted.")
+
+        # Wait for the loading process to complete
+        WebDriverWait(driver, 10).until(
+            EC.text_to_be_present_in_element((By.CLASS_NAME, "loading-container"), "Processing your payment...")
+        )
+        print("Loading process started.")
+
+        # Wait for redirection to the success page
+        WebDriverWait(driver, 15).until(
+            EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "Flight booked successfully")
+        )
+        print("Payment completed successfully.")
+
+        WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.history-button"))
+        ).click()
+        print("Clicked 'View Booking History' button.")
+
+        time.sleep(4)
+
+        # Verify navigation to the booking history page
+        WebDriverWait(driver, 10).until(
+            EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "Booking History")
+        )
+        print("Successfully navigated to the Booking History page.")
+
+    except Exception as e:
+        print(f"Flight booking test failed: {e}")
 
 
 
@@ -173,9 +245,7 @@ try:
     # Run tests
     test_open_homepage()
     test_register_login_logout_registerfaild()
-
-
-    test_search_flights()
+    test_booking_process()
 
 
 finally:
