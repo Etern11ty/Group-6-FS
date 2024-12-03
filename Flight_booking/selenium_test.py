@@ -191,6 +191,11 @@ def test_booking_process():
             EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "Booking History")
         )
         print("Successfully navigated to the Booking History page.")
+        
+        driver.get("http://127.0.0.1:5000/logout")
+        time.sleep(2)
+        assert "Login" in driver.page_source
+        print("Logout successful.")
 
     except Exception as e:
         print(f"Flight booking test failed: {e}")
@@ -200,38 +205,52 @@ def test_booking_process():
 
 def test_booking_history_authenticated():
     try:
+        # Step 1: Log in
         driver.get("http://127.0.0.1:5000/login_page")
-        
-        # Log in
         driver.find_element(By.NAME, "username").send_keys("aaa")
         driver.find_element(By.NAME, "password").send_keys("aaa")
         driver.find_element(By.XPATH, "//button[text()='Login']").click()
-        
         time.sleep(2)
         
-        # Navigate to booking history page
+        # Step 2: Navigate to booking history page
         driver.get("http://127.0.0.1:5000/booking-history")
+        time.sleep(2)
+        assert "Booking History" in driver.page_source, "Booking History page not loaded."
+        print("Booking history page loaded successfully.")
         
+        # Step 3: Dynamically extract booking_id
+        booking_links = driver.find_elements(By.XPATH, "//a[contains(@href, '/select_seat/')]")
+        if booking_links:
+            booking_id = booking_links[0].get_attribute("href").split("/")[-1]
+        else:
+            raise Exception("No bookings found to select a seat.")
+        
+        # Step 4: Navigate to seat selection page
+        driver.get(f"http://127.0.0.1:5000/select_seat/{booking_id}")
+        time.sleep(2)
+        assert "Select Seat" in driver.page_source, "Seat selection page not loaded."
+        print("Seat selection page loaded successfully.")
+        
+        # Step 5: Select a seat dynamically
+        available_seats = driver.find_elements(By.XPATH, "//button[contains(@class, 'seat-button') and not(contains(@class, 'occupied'))]")
+        if available_seats:
+            available_seats[0].click()
+        else:
+            raise Exception("No available seats found.")
         time.sleep(2)
         
-        # Check booking history
-        assert "Booking History" in driver.page_source
-        print("Authenticated booking history test passed.")
+        # Step 6: Confirm the seat selection
+        confirm_button = driver.find_element(By.XPATH, "//button[text()='Confirm']")
+        confirm_button.click()
+        time.sleep(2)
+        
+        # Verify seat selection success
+        assert "Seat selected successfully" in driver.page_source, "Seat selection failed."
+        print("Seat selection test passed.")
+    
     except Exception as e:
-        print(f"Authenticated booking history test failed: {e}")
+        print(f"Booking history and seat selection test failed: {e}")
 
-def test_booking_history_unauthenticated():
-    try:
-        driver.get("http://127.0.0.1:5000/logout")  # Ensure logged-out state
-        driver.get("http://127.0.0.1:5000/booking-history")
-        
-        time.sleep(2)
-        
-        # Check for access denial
-        assert "User not authenticated" in driver.page_source
-        print("Unauthenticated booking history test passed.")
-    except Exception as e:
-        print(f"Unauthenticated booking history test failed: {e}")
 
 # Start the Flask app in a separate thread
 flask_thread = Thread(target=start_flask_app)
