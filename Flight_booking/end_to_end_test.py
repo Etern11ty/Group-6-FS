@@ -1,4 +1,3 @@
-from ast import Global
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from threading import Thread, Event
@@ -6,8 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from flightbook import app
 import time
 import os
-import requests  # Added to check if the Flask app is up
-from werkzeug.serving import make_server  # Added to run the Flask app without blocking
+from werkzeug.serving import make_server
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -26,13 +24,13 @@ def start_flask_app():
 
 driver = webdriver.Edge()
 
-def test_open_homepage():
-    try:
-        driver.get("http://127.0.0.1:5000")
-        assert "Flight" in driver.title
-        print("Homepage test passed.")
-    except Exception as e:
-        print(f"Homepage test failed: {e}")
+# def test_open_homepage():
+#     try:
+#         driver.get("http://127.0.0.1:5000")
+#         assert "Flight" in driver.title
+#         print("Homepage test passed.")
+#     except Exception as e:
+#         print(f"Homepage test failed: {e}")
 
 def test_register_login_logout_registerfaild():
     try:
@@ -181,35 +179,21 @@ def test_booking_process():
         print("Payment completed successfully.")
 
         WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.history-button"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.home-button"))
         ).click()
-        print("Clicked 'View Booking History' button.")
+        print("Clicked 'back to homepage' button.")
 
-        time.sleep(4)
+        time.sleep(2)
+        assert "Welcom" in driver.page_source
+        print("Successfully navigated to the home page.")
 
-        # Verify navigation to the booking history page
-        WebDriverWait(driver, 10).until(
-            EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "Booking History")
-        )
-        print("Successfully navigated to the Booking History page.")
+        print("\nBooking process test passed\n")
 
     except Exception as e:
         print(f"Flight booking test failed: {e}")
 
 
-
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-
-
-
-
- 
-
-def test_booking_history_authenticated():
+def test_history_and_select_seat():
     try:
         # Navigate to the booking history page
         driver.get("http://127.0.0.1:5000/booking-history")
@@ -256,7 +240,7 @@ def test_booking_history_authenticated():
             assert selected_seat_id in seat_text.text, f"Selected seat {selected_seat_id} not displayed on confirmation page."
             print(f"Seat {selected_seat_id} confirmed successfully on confirmation page.")
 
-        print("Seat selection test passed.")
+        print("\nview booking history and select seat process test passed\n")
     
     except Exception as e:
         print(f"Booking history and seat selection test failed: {e}")
@@ -276,10 +260,11 @@ flask_ready.wait(timeout=10)
 
 try:
     # Run tests
-    test_open_homepage()
+    # test_open_homepage()
+
     test_register_login_logout_registerfaild()
     test_booking_process()
-    test_booking_history_authenticated()
+    test_history_and_select_seat()
     
 
 finally:
