@@ -5,7 +5,7 @@ body {
 }
 
 .background-image-container {
-    background-image: url("{{ url_for('static', filename='register/images/background.jpg') }}");;
+    background-image: url("/static/register/images/background.jpg");
     background-size: cover;
     background-position: center;
     height: 100vh;
@@ -13,6 +13,7 @@ body {
     align-items: center;
     justify-content: center;
 }
+
 
 .confirmation-container {
     background: rgba(255, 255, 255, 0.9);  

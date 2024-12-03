@@ -1,3 +1,4 @@
+from ast import Global
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from threading import Thread, Event
@@ -191,11 +192,6 @@ def test_booking_process():
             EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "Booking History")
         )
         print("Successfully navigated to the Booking History page.")
-        
-        driver.get("http://127.0.0.1:5000/logout")
-        time.sleep(2)
-        assert "Login" in driver.page_source
-        print("Logout successful.")
 
     except Exception as e:
         print(f"Flight booking test failed: {e}")
@@ -203,53 +199,71 @@ def test_booking_process():
 
 
 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
+
+
+
+ 
+
 def test_booking_history_authenticated():
     try:
-        # Step 1: Log in
-        driver.get("http://127.0.0.1:5000/login_page")
-        driver.find_element(By.NAME, "username").send_keys("aaa")
-        driver.find_element(By.NAME, "password").send_keys("aaa")
-        driver.find_element(By.XPATH, "//button[text()='Login']").click()
-        time.sleep(2)
-        
-        # Step 2: Navigate to booking history page
+        # Navigate to the booking history page
         driver.get("http://127.0.0.1:5000/booking-history")
         time.sleep(2)
         assert "Booking History" in driver.page_source, "Booking History page not loaded."
         print("Booking history page loaded successfully.")
         
-        # Step 3: Dynamically extract booking_id
-        booking_links = driver.find_elements(By.XPATH, "//a[contains(@href, '/select_seat/')]")
-        if booking_links:
-            booking_id = booking_links[0].get_attribute("href").split("/")[-1]
+        # Click 'Go to Select Seat' button
+        seat_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "select-seat")))
+        seat_button.click()
+        time.sleep(2)
+        
+        #  Check if redirected to the seat confirmation page
+        current_url = driver.current_url
+        if "seat_confirmation" in current_url:
+            print("Redirected to seat confirmation page.")
+            # Verify correct seat number is displayed
+            seat_number = current_url.split("/")[-1]  # Extract seat number from URL
+            assert seat_number in driver.page_source, f"Seat confirmation failed: Seat {seat_number} not displayed."
+            print(f"Seat {seat_number} already selected. Confirmation page loaded successfully.")
         else:
-            raise Exception("No bookings found to select a seat.")
-        
-        # Step 4: Navigate to seat selection page
-        driver.get(f"http://127.0.0.1:5000/select_seat/{booking_id}")
-        time.sleep(2)
-        assert "Select Seat" in driver.page_source, "Seat selection page not loaded."
-        print("Seat selection page loaded successfully.")
-        
-        # Step 5: Select a seat dynamically
-        available_seats = driver.find_elements(By.XPATH, "//button[contains(@class, 'seat-button') and not(contains(@class, 'occupied'))]")
-        if available_seats:
-            available_seats[0].click()
-        else:
-            raise Exception("No available seats found.")
-        time.sleep(2)
-        
-        # Step 6: Confirm the seat selection
-        confirm_button = driver.find_element(By.XPATH, "//button[text()='Confirm']")
-        confirm_button.click()
-        time.sleep(2)
-        
-        # Verify seat selection success
-        assert "Seat selected successfully" in driver.page_source, "Seat selection failed."
+            # If not redirected, proceed with seat selection
+            print("Seat selection page loaded successfully.")
+            available_seat = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "available"))
+            )
+            selected_seat_id = available_seat.text  # Get seat ID
+            available_seat.click()
+            time.sleep(1)
+
+            selected_seat_input = driver.find_element(By.ID, "selected_seat")
+            assert selected_seat_input.get_attribute("value") == selected_seat_id, "Hidden input not updated with selected seat."
+            print(f"Seat {selected_seat_id} selected successfully.")
+
+            # Submit confirmation
+            confirm_button = driver.find_element(By.CSS_SELECTOR, ".confirm-button")
+            confirm_button.click()
+            time.sleep(2)
+            confirmation_message = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h2[contains(text(), 'Seat Booking Successfully')]")))
+            assert "Seat Booking Successfully" in confirmation_message.text, "Seat confirmation message not found."
+
+            # Verify seat details on the confirmation page
+            seat_text = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//p/strong[contains(text(), '" + selected_seat_id + "')]")))
+            assert selected_seat_id in seat_text.text, f"Selected seat {selected_seat_id} not displayed on confirmation page."
+            print(f"Seat {selected_seat_id} confirmed successfully on confirmation page.")
+
         print("Seat selection test passed.")
     
     except Exception as e:
         print(f"Booking history and seat selection test failed: {e}")
+
+
+
+
 
 
 # Start the Flask app in a separate thread
@@ -265,7 +279,8 @@ try:
     test_open_homepage()
     test_register_login_logout_registerfaild()
     test_booking_process()
-
+    test_booking_history_authenticated()
+    
 
 finally:
     driver.quit()
